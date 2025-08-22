@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { TopBar } from "~/widgets/topBar/ui/TopBar";
 
 export default function HomePage() {
@@ -5,7 +6,7 @@ export default function HomePage() {
     <main>
       <TopBar />
       <div className="text-white flex justify-center items-center text-9xl">
-        Главная
+        Профиль
       </div>
     </main>
   );
