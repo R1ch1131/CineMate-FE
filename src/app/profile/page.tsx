@@ -1,12 +1,13 @@
 import Link from "next/link";
+import { AuthButton } from "~/shared/authButton/ui/authButton";
 import { TopBar } from "~/widgets/topBar/ui/TopBar";
 
 export default function HomePage() {
   return (
     <main>
-      <TopBar />
-      <div className="text-white flex justify-center items-center text-9xl">
-        Профиль
+      <TopBar activeLink="/profile" />
+      <div className="flex justify-center items-center">
+        <AuthButton />
       </div>
     </main>
   );

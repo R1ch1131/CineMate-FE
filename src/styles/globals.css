@@ -4,3 +4,20 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
+
+@layer components {
+  .gradient-border {
+    @apply relative;
+  }
+  
+  .gradient-border::after {
+    @apply absolute left-0 w-0 h-0.5 bg-gradient-to-r from-amber-500 to-amber-700 transition-all duration-200;
+    content: '';
+    bottom: -5px; 
+  }
+  
+  .gradient-border:hover::after,
+  .gradient-border.active::after {
+    @apply w-full;
+  }
+}
