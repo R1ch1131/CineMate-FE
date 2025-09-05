@@ -1,5 +1,4 @@
-import { type Config } from 'tailwindcss';
-import tailwindcssAnimate from "tailwindcss-animate";
+import type { Config } from 'tailwindcss'
 
 export default {
     content: ["./src/**/*.tsx",
@@ -32,84 +31,16 @@ export default {
   		'900': '900'
   	},
   	extend: {
-  		gridTemplateColumns: {
-  			tags: 'repeat(auto-fill, minmax(3.125rem, auto))'
-  		},
-  		gridTemplateRows: {
-  			tags: 'repeat(2,1.25rem)'
-  		},
-  		fontFamily: {
-  			sans: [
-  				'var(--font-jbm)'
-  			]
-  		},
   		colors: {
-  			rosewater: 'rgb(var(--rosewater) / <alpha-value>)',
-  			flamingo: 'rgb(var(--flamingo) / <alpha-value>)',
-  			pink: 'rgb(var(--pink) / <alpha-value>)',
-  			mauve: 'rgb(var(--mauve) / <alpha-value>)',
-  			red: 'rgb(var(--red) / <alpha-value>)',
-  			maroon: 'rgb(var(--maroon) / <alpha-value>)',
-  			peach: 'rgb(var(--peach) / <alpha-value>)',
-  			yellow: 'rgb(var(--yellow) / <alpha-value>)',
-  			green: 'rgb(var(--green) / <alpha-value>)',
-  			teal: 'rgb(var(--teal) / <alpha-value>)',
-  			sky: 'rgb(var(--sky) / <alpha-value>)',
-  			sapphire: 'rgb(var(--sapphire) / <alpha-value>)',
-  			blue: 'rgb(var(--blue) / <alpha-value>)',
-  			lavender: 'rgb(var(--lavender) / <alpha-value>)',
-  			text: 'rgb(var(--text) / <alpha-value>)',
-  			sub: 'rgb(var(--sub) / <alpha-value>)',
-  			'sub-secondary': 'rgb(var(--sub-secondary) / <alpha-value>)',
-  			overlay: 'rgb(var(--overlay) / <alpha-value>)',
-  			'overlay-secondary': 'rgb(var(--overlay-secondary) / <alpha-value>)',
-  			'overlay-tertiary': 'rgb(var(--overlay-tertiary) / <alpha-value>)',
-  			surface: 'rgb(var(--surface) / <alpha-value>)',
-  			'surface-secondary': 'rgb(var(--surface-secondary) / <alpha-value>)',
-  			'surface-tertiary': 'rgb(var(--surface-tertiary) / <alpha-value>)',
-  			base: 'rgb(var(--base) / <alpha-value>)',
-  			mantle: 'rgb(var(--mantle) / <alpha-value>)',
-  			crust: 'rgb(var(--crust) / <alpha-value>)',
-  			background: 'hsl(var(--background))',
-  			foreground: 'hsl(var(--foreground))',
-  			card: {
-  				DEFAULT: 'hsl(var(--card))',
-  				foreground: 'hsl(var(--card-foreground))'
-  			},
-  			popover: {
-  				DEFAULT: 'hsl(var(--popover))',
-  				foreground: 'hsl(var(--popover-foreground))'
-  			},
-  			primary: {
-  				DEFAULT: 'hsl(var(--primary))',
-  				foreground: 'hsl(var(--primary-foreground))'
-  			},
-  			secondary: {
-  				DEFAULT: 'hsl(var(--secondary))',
-  				foreground: 'hsl(var(--secondary-foreground))'
-  			},
-  			muted: {
-  				DEFAULT: 'hsl(var(--muted))',
-  				foreground: 'hsl(var(--muted-foreground))'
-  			},
-  			accent: {
-  				DEFAULT: 'hsl(var(--accent))',
-  				foreground: 'hsl(var(--accent-foreground))'
-  			},
-  			destructive: {
-  				DEFAULT: 'hsl(var(--destructive))',
-  				foreground: 'hsl(var(--destructive-foreground))'
-  			},
-  			border: 'hsl(var(--border))',
-  			input: 'hsl(var(--input))',
-  			ring: 'hsl(var(--ring))',
-  			chart: {
-  				'1': 'hsl(var(--chart-1))',
-  				'2': 'hsl(var(--chart-2))',
-  				'3': 'hsl(var(--chart-3))',
-  				'4': 'hsl(var(--chart-4))',
-  				'5': 'hsl(var(--chart-5))'
-  			}
+			gradient: 'rgb(var(--gradient) / <alpha-value>)',
+			darkblue: 'rgb(var(--darkblue) / <alpha-value>)',
+			lightblue: 'rgb(var(--lightblue) / <alpha-value>)',
+			lightorange: 'rgb(var(--lightorange) / <alpha-value>)',
+			darkorange: 'rgb(var(--darkorange) / <alpha-value>)',
+			grey: 'rgb(var(--grey) / <alpha-value>)',
+			glass: 'rgb(var(--glass) / <alpha-value>)',
+			frostedglass: 'rgb(var(--frostedglass) / <alpha-value>)',
+			orange: 'rgb(var(--orange) / <alpha-value>)',
   		},
   		borderRadius: {
   			'2': '0.125rem',
@@ -196,8 +127,6 @@ export default {
   			'9/12': '75%',
   			'10/12': '83.333333%',
   			'11/12': '91.666667%',
-  			popup: 'var(--popup-min-width)',
-  			'popup-dragdrop': 'var(--popup-dragdrop-min-width)'
   		},
   		maxWidth: {
   			'0': '0px',
@@ -263,11 +192,6 @@ export default {
   			'9/12': '75%',
   			'10/12': '83.333333%',
   			'11/12': '91.666667%',
-  			popup: 'var(--popup-max-width)',
-  			input: 'var(--input-max-width)',
-  			select: 'var(--select-max-width)',
-  			preferens: 'var(--preferens-max-width)',
-  			card: 'var(--card-max-width)'
   		},
   		minHeight: {
   			'0': '0px',
@@ -335,8 +259,6 @@ export default {
   			'11/12': '91.666667%',
   			screen: '100dvh',
   			page: 'var(--page-height)',
-  			popup: 'var(--popup-min-height)',
-  			card: 'var(--card-min-height)'
   		},
   		maxHeight: {
   			'0': '0px',
@@ -435,10 +357,6 @@ export default {
   				}
   			}
   		},
-  		animation: {
-  			'fade-in': 'fade-in 0.5s'
-  		}
   	}
   },
-  plugins: [tailwindcssAnimate],
 } satisfies Config;

@@ -1,4 +1,4 @@
-import { TopBar } from "~/widgets/topBar/ui/TopBar";
+import { TopBar } from "~/widgets/topBar";
 
 export default function HomePage() {
   return (

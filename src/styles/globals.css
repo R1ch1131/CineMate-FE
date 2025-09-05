@@ -1,17 +1,55 @@
+/* src/styles/globals.css */
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  --color-darkblue: rgb(2 6 24);
+  --color-lightblue: rgb(22 36 85);
+  --color-lightorange: rgb(221 122 28);
+  --color-darkorange: rgb(244 74 0);
+  --color-grey: rgb(152 160 174);
+  --color-glass: rgba(255, 255, 255,.060);
+  --color-frostedglass: rgba(255, 255, 255,.09);
+  --color-orange: rgb(255, 165, 0);
+
+
+  --color-gradient: linear-gradient(90deg, var(--color-darkorange), var(--color-lightorange));
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+
+  
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.1;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(1.2);
+  }
+}
+
+.animate-pulse {
+  animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @layer components {
+  .gradient {
+   @apply bg-gradient-to-r from-lightorange to-darkorange bg-clip-text text-transparent
+  }
+
+  .tabClassname {
+    @apply text-grey from-lightorange to-darkorange rounded-xl px-4 py-2 duration-200 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:text-white data-selected:bg-gradient-to-r data-selected:text-white
+  }
+
   .gradient-border {
     @apply relative;
   }
   
   .gradient-border::after {
-    @apply absolute left-0 w-0 h-0.5 bg-gradient-to-r from-amber-500 to-amber-700 transition-all duration-200;
+    @apply absolute left-0 w-0 h-0.5 bg-gradient-to-r from-lightorange to-darkorange transition-all duration-400;
     content: '';
     bottom: -5px; 
   }
@@ -20,4 +58,18 @@
   .gradient-border.active::after {
     @apply w-full;
   }
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.05) inset !important;
+    -webkit-text-fill-color: rgb(255, 255, 255) !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+input.autofill:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important;
+    -webkit-text-fill-color: white !important;
 }

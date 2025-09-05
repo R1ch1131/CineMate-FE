@@ -1,0 +1,1 @@
+export { RegistrButton } from './ui/RegistrButton';

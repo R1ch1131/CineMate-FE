@@ -1,0 +1,22 @@
+<svg width="636" height="104" viewBox="0 0 636 104" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="560" y="29" width="5" height="36" transform="rotate(-90 560 29)" fill="darkorange"/>
+<rect x="560" y="80" width="5" height="36" transform="rotate(-90 560 80)" fill="darkorange"/>
+<rect x="560" y="54" width="5" height="36" transform="rotate(-90 560 54)" fill="darkorange"/>
+<rect x="485" y="29" width="5" height="44" transform="rotate(-90 485 29)" fill="darkorange"/>
+<rect x="505" y="24" width="5" height="56" fill="darkorange"/>
+<path d="M465.5 53L419 80V76L461 53L419 28V24L465.5 53Z" fill="white"/>
+<rect x="416" y="24" width="3" height="56" fill="white"/>
+<path d="M433 53L419 73V76L421 75L435.5 54.5H458.5L461 53L458.5 51.5H435.5L421 29L419 28V31L433 53Z" fill="white"/>
+<rect x="328" y="24" width="5" height="56" fill="darkorange"/>
+<rect x="380" y="24" width="5" height="56" fill="darkorange"/>
+<path d="M356.5 65L333 24V34L356.5 75V65Z" fill="darkorange"/>
+<path d="M356.5 65L380 24V34L356.5 75V65Z" fill="darkorange"/>
+<rect x="254" y="29" width="5" height="36" transform="rotate(-90 254 29)" fill="darkorange"/>
+<rect x="254" y="80" width="5" height="36" transform="rotate(-90 254 80)" fill="darkorange"/>
+<rect x="254" y="54" width="5" height="36" transform="rotate(-90 254 54)" fill="darkorange"/>
+<rect x="168" y="24" width="5" height="56" fill="darkorange"/>
+<rect x="209" y="24" width="5" height="56" fill="darkorange"/>
+<path d="M209 70.5L173 24V34L209 80V70.5Z" fill="darkorange"/>
+<rect x="123" y="24" width="5" height="56" fill="darkorange"/>
+<path d="M87.799 32.201C83.8831 28.2851 78.894 25.6184 73.4625 24.538C68.0311 23.4576 62.4012 24.0121 57.2849 26.1314C52.1685 28.2506 47.7955 31.8395 44.7188 36.444C41.6422 41.0486 40 46.4621 40 52C40 57.5379 41.6422 62.9514 44.7189 67.556C47.7955 72.1605 52.1685 75.7494 57.2849 77.8686C62.4012 79.9879 68.0311 80.5424 73.4625 79.462C78.894 78.3816 83.8831 75.7149 87.799 71.799L84.7568 68.7568C81.4426 72.071 77.2201 74.3279 72.6232 75.2423C68.0263 76.1567 63.2615 75.6874 58.9313 73.8938C54.6011 72.1002 50.9 69.0628 48.2961 65.1657C45.6922 61.2687 44.3023 56.687 44.3023 52C44.3023 47.313 45.6922 42.7313 48.2961 38.8343C50.9 34.9372 54.6011 31.8998 58.9313 30.1062C63.2615 28.3126 68.0263 27.8433 72.6232 28.7577C77.2201 29.6721 81.4426 31.929 84.7568 35.2432L87.799 32.201Z" fill="darkorange"/>
+</svg>
