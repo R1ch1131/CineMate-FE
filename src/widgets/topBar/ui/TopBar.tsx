@@ -1,38 +1,46 @@
 import React from "react";
 import Link from "next/link";
-import { AuthButton } from "~/shared/authButton/ui/authButton";
+import { CONSTANTS } from '~/shared/lib/strings';
+import { AuthButton } from "~/shared/ui/authButton/ui/authButton";
+import Image from 'next/image';
+import logoImage from '~/shared/assets/icons/cinemateLogo.svg';
 
 interface TopBarProps {
   activeLink?: string;
 }
 
-const activelinkClass  = "text-amber-600 transition-transform hover:-translate-y-1 duration-500 gradient-border active"
-const hoverLinkClass = "hover:text-amber-600 transition-transform hover:-translate-y-1 duration-500 transition-colors duration-300 gradient-border"
+const activelinkClass = "text-lightorange transition-transform hover:-translate-y-1 gradient-border active"
+const hoverLinkClass = "hover:text-lightorange transition-transform hover:-translate-y-1 transition-colors gradient-border"
 
 export const TopBar = ({ activeLink = "/" }: TopBarProps) => {
   return (
-    <div className="flex h-18 w-full items-center justify-between px-32 py-4 text-white">
+    <div className="flex h-22 w-full items-center justify-between px-32 py-4 text-white">
       <div>
-        <Link href="/" className="text-2xl font-bold text-amber-600">
-          CineMate
+        <Link href="/">
+          <Image src={logoImage}  
+            alt="Cinemate Logo"
+            width={250} 
+          />
         </Link>
       </div>
-      <div className="flex gap-x-10">
-        <Link href="/" className={` ${activeLink === "/" ? `${activelinkClass}` : `${hoverLinkClass}`}`}>
-          Главная
+      <div className="flex w-full justify-center gap-x-10">
+        <Link href="/" className={`${activeLink === "/" ? `${activelinkClass}` : `${hoverLinkClass}`}`}>
+          {CONSTANTS.topBar.main}
         </Link>
         <Link href="/movies" className={`${activeLink === "/movies" ?  `${activelinkClass}` : `${hoverLinkClass}`}`}>
-          Фильмы
+          {CONSTANTS.topBar.films}
         </Link>
         <Link href="/reviews" className={`${activeLink === "/reviews" ?  `${activelinkClass}` : `${hoverLinkClass}`}`}>
-          Рецензии
+          {CONSTANTS.topBar.reviews}
         </Link>
         <Link href="/mylist" className={`${activeLink === "/mylist" ?  `${activelinkClass}` : `${hoverLinkClass}`}`}>
-          Мой список
+          {CONSTANTS.topBar.myList}
         </Link>
       </div>
       <div>
-        <AuthButton  />
+        <Link href="/auth">
+          <AuthButton text="Вход"/>
+        </Link>
       </div>
     </div>
   );
