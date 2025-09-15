@@ -11,6 +11,7 @@
   --color-glass: rgba(255, 255, 255,.060);
   --color-frostedglass: rgba(255, 255, 255,.09);
   --color-orange: rgb(255, 165, 0);
+  --color-shadow: rgba(0, 0, 0,.7);
 
 
   --color-gradient: linear-gradient(90deg, var(--color-darkorange), var(--color-lightorange));

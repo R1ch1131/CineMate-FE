@@ -41,6 +41,7 @@ export default {
 			glass: 'rgb(var(--glass) / <alpha-value>)',
 			frostedglass: 'rgb(var(--frostedglass) / <alpha-value>)',
 			orange: 'rgb(var(--orange) / <alpha-value>)',
+			shadow: 'rgb(var(--shadow) / <alpha-value>)',
   		},
   		borderRadius: {
   			'2': '0.125rem',
@@ -61,7 +62,8 @@ export default {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		width: {
-  			'88': '21.875rem'
+  			'88': '21.875rem',
+			'122': '122.5rem'
   		},
   		minWidth: {
   			'0': '0px',

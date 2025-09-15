@@ -25,9 +25,9 @@ export const StatsBlock = () => {
       </div>
       <div className="bg-frostedglass border-glass flex h-34 w-58 flex-col items-center justify-center gap-1 rounded-2xl border text-white shadow-2xl">
         <Image
-          style={{
+           style={{
             filter:
-              "brightness(0) saturate(100%) invert(15%) sepia(99%) saturate(6652%) hue-rotate(281deg) brightness(93%) contrast(101%)",
+              "brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)",
           }}
           src={Rewiews}
           width={35}
@@ -39,9 +39,9 @@ export const StatsBlock = () => {
       </div>
       <div className="bg-frostedglass border-glass flex h-34 w-58 flex-col items-center justify-center gap-1 rounded-2xl border text-white shadow-2xl">
         <Image
-          style={{
+           style={{
             filter:
-              "brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)",
+              "brightness(0) saturate(100%) invert(15%) sepia(99%) saturate(6652%) hue-rotate(281deg) brightness(93%) contrast(101%)",
           }}
           src={Users}
           width={35}
