@@ -1,0 +1,1 @@
+export { ActorTab } from './ui/ActorTab';

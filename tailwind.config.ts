@@ -5,6 +5,15 @@ export default {
     "./app/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+	screens: {
+      'sm': '640px',
+      'md': '768px', 
+      'lg': '1024px',
+      'xl': '1280px',
+      '2xl': '1536px',
+      '3xl': '1920px', // Для Full HD
+      '4xl': '2560px', // Для 2K
+    },
   	fontSize: {
   		'10': '0.625rem',
   		'12': '0.75rem',
