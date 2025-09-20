@@ -4,10 +4,10 @@ import { FilmCrew } from "~/shared/ui/FilmCrew";
 
 export const ActorTab = () => {
     return(
-        <div className="text-white flex flex-col gap-6 px-4">
-            <p className="text-3xl font-bold pt-5">Актеры и съемочная группа </p>
+        <div className="text-white flex flex-col gap-6 p-3 2k:p-5">
+            <p className="text-3xl font-bold ">Актеры и съемочная группа </p>
             <p  className="text-3xl font-bold">Главные роли</p>
-            <div className="flex gap-4.5">
+            <div className="2k:gap-8 gap-10 grid grid-cols-4">
             <Actor/>
             <Actor/>
             <Actor/>

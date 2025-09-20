@@ -6,7 +6,7 @@ export const Actor = () => {
     return(
         <div className="flex">
             <div className="flex flex-col justify-center items-center gap-4 hover:-translate-y-1.5 transition-transform">
-                <div className="relative h-58 w-58 lg:h-50 lg:w-50">
+                <div className="relative 2k:h-72 2k:w-72 h-55 w-55">
                     <Image
                         fill
                         className="rounded-2xl object-cover"
