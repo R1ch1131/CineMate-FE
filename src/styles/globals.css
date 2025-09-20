@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @theme {
+  
   --breakpoint-2k: 2560px;
 
   --color-darkblue: rgb(2 6 24);
@@ -41,6 +42,16 @@
    @apply bg-gradient-to-r from-lightorange to-darkorange bg-clip-text text-transparent
   }
 
+   .invisible-scroll {
+        overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    .invisible-scroll::-webkit-scrollbar {
+        display: none;
+    }
+    
   .tabClassname {
     @apply text-grey from-lightorange to-darkorange rounded-xl px-4 py-2 duration-200 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:text-white data-selected:bg-gradient-to-r data-selected:text-white
   }

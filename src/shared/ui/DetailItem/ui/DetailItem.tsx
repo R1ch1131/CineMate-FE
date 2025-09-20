@@ -8,7 +8,7 @@ interface DetailItemProps {
 
 export const DetailItem = ({ label, value, className = "" }: DetailItemProps) => {
   return (
-    <div className={`flex text-lg justify-between ${className}`}>
+    <div className={`flex text-lg 2k:text-xl justify-between ${className}`}>
       <span className="text-grey">{label}</span>
       <span>{value}</span>
     </div>
