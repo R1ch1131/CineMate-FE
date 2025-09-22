@@ -3,6 +3,7 @@ import { Field, Input } from '@headlessui/react'
 import Image from 'next/image';
 import profileImage from '~/shared/assets/icons/profile.svg';
 import type { UseFormRegisterReturn } from "react-hook-form";
+import { User } from 'lucide-react';
 
 interface TextInputProps {
   error?: string;
@@ -34,12 +35,7 @@ export const TextInput: React.FC< TextInputProps> = ({
               {...props}
             />
             <div className="absolute left-3.5 top-1/2 transform -translate-y-1/2">
-              <Image 
-                src={profileImage}
-                alt="mail"
-                width={23}
-                className="filter brightness-0 invert opacity-65"
-              />
+              <User className='text-white'/>
             </div>
           </div>
           {error && (

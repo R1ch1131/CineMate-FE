@@ -1,8 +1,8 @@
 import "~/styles/globals.css";
-
 import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Providers } from "./providers";
+import { TopBar } from "~/widgets/topBar";
 
 export const metadata: Metadata = {
   title: "CineMate",
@@ -22,7 +22,10 @@ export default function RootLayout({
     <html lang="en" className={`${geist.variable}`}>
       <body>
         <Providers>
-          {children}
+          <TopBar />
+          <main>
+            {children}
+          </main>
         </Providers>
       </body>
     </html>

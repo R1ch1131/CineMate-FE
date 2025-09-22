@@ -1,8 +1,7 @@
 import React from "react";
 import { Field, Input } from '@headlessui/react'
-import Image from 'next/image';
-import passwordImage from '~/shared/assets/icons/password.svg';
 import type { UseFormRegisterReturn } from "react-hook-form";
+import { Lock } from 'lucide-react';
 
 interface PasswordInputProps {
   error?: string;
@@ -33,12 +32,7 @@ export const PasswordInput: React.FC< PasswordInputProps> = ({
               {...props}
             />
             <div className="absolute left-3.5 top-1/2 transform -translate-y-1/2">
-              <Image 
-                src={passwordImage}
-                alt="mail"
-                width={23}
-                className="filter brightness-0 invert opacity-65"
-              />
+              <Lock className='text-white'/>
             </div>
           </div>
           {error && (

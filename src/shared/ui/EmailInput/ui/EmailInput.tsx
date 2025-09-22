@@ -1,8 +1,7 @@
 import React from 'react';
 import { Field, Input } from '@headlessui/react';
-import Image from 'next/image';
-import mailImage from '~/shared/assets/icons/mail.svg';
 import type { UseFormRegisterReturn } from 'react-hook-form';
+import { Mail } from 'lucide-react';
 
 interface EmailInputProps {
   error?: string;
@@ -34,12 +33,7 @@ export const EmailInput: React.FC<EmailInputProps> = ({
               {...props}
             />
             <div className="absolute left-3.5 top-1/2 transform -translate-y-1/2">
-              <Image 
-                src={mailImage}
-                alt="mail"
-                width={23}
-                className="filter brightness-0 invert opacity-65"
-              />
+              <Mail className='text-white'/>
             </div>
           </div>
           {error && (
