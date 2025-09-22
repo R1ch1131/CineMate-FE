@@ -1,55 +1,39 @@
-'use client'
+"use client";
 
 import React, { useState } from "react";
 import Image from "next/image";
-import starImage from '~/shared/assets/icons/stars.svg';
-import { AuthTabs } from "~/widgets/AuthTabs";
-import {CONSTANTS} from "~/shared/lib/strings"
-import logoImage from '~/shared/assets/icons/cinemateLogo.svg';
+import { AuthTabs } from "~/features/AuthTabs";
+import { CONSTANTS } from "~/shared/lib/strings";
+import logoImage from "~/shared/assets/icons/cinemateLogo.svg";
 import Link from "next/link";
+import { Sparkles } from "lucide-react";
 
 export default function HomePage() {
   const [selectedTab] = useState(0);
 
-  const welcomeTexts = [
-    "Добро пожаловать обратно!",
-    "Присоединяйтесь к нам!"
-  ];
-
-   return (
-    <main> 
-      <div> 
-         <Link className="absolute top-7 left-32" href="/">
-          <Image src={logoImage}  
-            alt="Cinemate Logo"
-            width={250} 
-          />
+  const welcomeTexts = ["Добро пожаловать обратно!", "Присоединяйтесь к нам!"];
+  return (
+    <main>
+      <div>
+        <Link className="absolute top-6 left-32" href="/">
+          <Image src={logoImage} alt="Cinemate Logo" width={250} />
         </Link>
-        <div className="min-h-screen flex items-center justify-center">
-
-        <div className="relative flex flex-col justify-center items-center gap-[clamp(1rem,3vw,2rem)]">
-          <p className="gradient text-3xl">{welcomeTexts[selectedTab]}</p>
-          <div className="flex gap-2">
-            <Image 
-                src={starImage}
-                alt="star"
-                width={19}
-              />
-            <p className="text-orange text-xl">{CONSTANTS.auth.label.open}</p>
-            <Image 
-                src={starImage}
-                alt="star"
-                width={19}
-              />
-          </div>
-          <div className="relative flex justify-center w-[400px] bg-glass shadow-2xl border-1 border-gray-600 rounded-3xl">
-            <div className="my-10 w-full">
-              <AuthTabs /> 
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="relative flex flex-col items-center justify-center gap-[clamp(1rem,3vw,2rem)]">
+            <p className="gradient text-3xl">{welcomeTexts[selectedTab]}</p>
+            <div className="flex gap-2">
+              <Sparkles className="text-orange" />
+              <p className="text-orange text-xl">{CONSTANTS.auth.label.open}</p>
+              <Sparkles className="text-orange"/>
+            </div>
+            <div className="bg-glass relative flex w-[400px] justify-center rounded-3xl border-1 border-gray-600 shadow-2xl">
+              <div className="my-10 w-full">
+                <AuthTabs />
+              </div>
             </div>
           </div>
         </div>
-        </div>
-      </div> 
-    </main> 
+      </div>
+    </main>
   );
 }

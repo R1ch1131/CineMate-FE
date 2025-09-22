@@ -1,45 +1,62 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
-import { CONSTANTS } from '~/shared/lib/strings';
+import { CONSTANTS } from "~/shared/lib/strings";
 import { AuthButton } from "~/shared/ui/authButton/ui/authButton";
-import Image from 'next/image';
-import logoImage from '~/shared/assets/icons/cinemateLogo.svg';
+import Image from "next/image";
+import logoImage from "~/shared/assets/icons/cinemateLogo.svg";
+import { useActivePath } from "~/shared/lib/hooks/useActivePath";
 
-interface TopBarProps {
-  activeLink?: string;
-}
+const activelinkClass =
+  "text-lightorange transition-transform hover:-translate-y-1 gradient-border active";
+const hoverLinkClass =
+  "hover:text-lightorange transition-transform hover:-translate-y-1 transition-colors gradient-border";
 
-const activelinkClass = "text-lightorange transition-transform hover:-translate-y-1 gradient-border active"
-const hoverLinkClass = "hover:text-lightorange transition-transform hover:-translate-y-1 transition-colors gradient-border"
+const HIDDEN_PATHS = ["/auth"];
 
-export const TopBar = ({ activeLink = "/" }: TopBarProps) => {
+export const TopBar = () => {
+  const activeLink = useActivePath();
+
+  if (HIDDEN_PATHS.includes(activeLink)) {
+    return null;
+  }
   return (
-    <div className="flex h-22 w-full items-center justify-between px-32 py-4 text-white">
-      <div>
+    <div className="mb-5 flex h-22 w-full items-center justify-between px-32 py-4 text-white">
+      <div className="flex-1">
         <Link href="/">
-          <Image src={logoImage}  
-            alt="Cinemate Logo"
-            width={250} 
-          />
+          <Image src={logoImage} alt="Cinemate Logo" width={250} />
         </Link>
       </div>
-      <div className="flex w-full justify-center gap-x-10">
-        <Link href="/" className={`${activeLink === "/" ? `${activelinkClass}` : `${hoverLinkClass}`}`}>
-          {CONSTANTS.topBar.main}
+      <div className="flex flex-1 justify-center gap-x-10">
+        <Link
+          href="/"
+          className={`${activeLink === "/" ? `${activelinkClass}` : `${hoverLinkClass}`}`}
+        >
+          <p className="2k:text-xl text-lg">{CONSTANTS.topBar.main}</p>
         </Link>
-        <Link href="/movies" className={`${activeLink === "/movies" ?  `${activelinkClass}` : `${hoverLinkClass}`}`}>
-          {CONSTANTS.topBar.films}
+        <Link
+          href="/movies"
+          className={`${activeLink === "/movies" ? `${activelinkClass}` : `${hoverLinkClass}`}`}
+        >
+          <p className="2k:text-xl text-lg">{CONSTANTS.topBar.films}</p>
         </Link>
-        <Link href="/reviews" className={`${activeLink === "/reviews" ?  `${activelinkClass}` : `${hoverLinkClass}`}`}>
-          {CONSTANTS.topBar.reviews}
+        <Link
+          href="/reviews"
+          className={`${activeLink === "/reviews" ? `${activelinkClass}` : `${hoverLinkClass}`}`}
+        >
+          <p className="2k:text-xl text-lg">{CONSTANTS.topBar.reviews}</p>
         </Link>
-        <Link href="/mylist" className={`${activeLink === "/mylist" ?  `${activelinkClass}` : `${hoverLinkClass}`}`}>
-          {CONSTANTS.topBar.myList}
+        <Link
+          href="/mylist"
+          className={`${activeLink === "/mylist" ? `${activelinkClass}` : `${hoverLinkClass}`}`}
+        >
+          <p className="2k:text-xl text-lg">{CONSTANTS.topBar.myList}</p>
         </Link>
       </div>
-      <div>
+      <div className="flex flex-1 justify-end">
         <Link href="/auth">
-          <AuthButton text="Вход"/>
+          <AuthButton text="Вход" />
         </Link>
       </div>
     </div>
