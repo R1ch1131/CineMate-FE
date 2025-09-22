@@ -1,0 +1,1 @@
+export { TrendItem } from "./ui/TrendItem";
