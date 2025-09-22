@@ -6,6 +6,7 @@ import { FilmCard } from "~/entities/FilmCard/ui/FilmCard";
 import Link from "next/link";
 import { BookOpen, Flame, Newspaper } from "lucide-react";
 import { Property } from "~/entities/Property";
+import { SideBar } from "~/features/SideBar";
 
 export default function HomePage() {
   return (
@@ -53,7 +54,7 @@ export default function HomePage() {
         </Link>
         </div>
         <div className="h-96">
-
+        <SideBar />
         </div>
       </div>
     </main>
