@@ -5,15 +5,6 @@ export default {
     "./app/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-	screens: {
-      'sm': '640px',
-      'md': '768px', 
-      'lg': '1024px',
-      'xl': '1280px',
-      '2xl': '1536px',
-      '3xl': '1920px', // Для Full HD
-      '4xl': '2560px', // Для 2K
-    },
   	fontSize: {
   		'10': '0.625rem',
   		'12': '0.75rem',
@@ -53,6 +44,7 @@ export default {
 			shadow: 'rgb(var(--shadow) / <alpha-value>)',
   		},
   		borderRadius: {
+			'1': '0.060rem',
   			'2': '0.125rem',
   			'4': '0.25rem',
   			'6': '0.375rem',
