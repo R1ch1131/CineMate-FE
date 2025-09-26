@@ -3,6 +3,7 @@ import { BookOpen, Crown, Edit3, Film, Heart, Users } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 import { ProfileStats } from "~/entities/ProfileStats";
+import { ProfileViewTab } from "~/features/ProfileViewTab";
 import Ava from "~/shared/assets/icons/actor.jpg";
 
 interface ProfileCardProps {
@@ -54,7 +55,7 @@ export const ProfileCard = ({ name, description, date }: ProfileCardProps) => {
       </div>
       <TabGroup className="pt-8">
               <TabList className="bg-glass flex h-13 2k:h-15 items-center rounded-xl">
-                <Tab className={`${tabStyle}`}>Обзор</Tab>
+                <Tab className={`${tabStyle}`}>Обзор1</Tab>
                 <Tab className={`${tabStyle}`}>Рецензии</Tab>
                 <Tab className={`${tabStyle}`}>Избранное</Tab>
                 <Tab className={`${tabStyle}`}>Споры</Tab>
@@ -62,7 +63,7 @@ export const ProfileCard = ({ name, description, date }: ProfileCardProps) => {
               </TabList>
               <TabPanels className="mt-3">
                 <TabPanel>
-                  1
+                  <ProfileViewTab />
                 </TabPanel>
                 <TabPanel>
                  2
