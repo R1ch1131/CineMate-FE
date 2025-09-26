@@ -55,7 +55,7 @@ export const ProfileCard = ({ name, description, date }: ProfileCardProps) => {
       </div>
       <TabGroup className="pt-8">
               <TabList className="bg-glass flex h-13 2k:h-15 items-center rounded-xl">
-                <Tab className={`${tabStyle}`}>Обзор</Tab>
+                <Tab className={`${tabStyle}`}>Обзор1</Tab>
                 <Tab className={`${tabStyle}`}>Рецензии</Tab>
                 <Tab className={`${tabStyle}`}>Избранное</Tab>
                 <Tab className={`${tabStyle}`}>Споры</Tab>
