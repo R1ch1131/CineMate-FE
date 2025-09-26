@@ -1,9 +1,10 @@
+import React from "react";
+import { UnauthorizedMyList } from "~/features/UnauthorizedMyList";
+
 export default function HomePage() {
   return (
-    <main>
-      <div className="text-white flex justify-center items-center text-9xl">
-        Мой список
-      </div>
-    </main>
+    <div className="flex justify-center pt-60 2k:pt-96 items-center h-full">
+      <UnauthorizedMyList />
+    </div>
   );
 }

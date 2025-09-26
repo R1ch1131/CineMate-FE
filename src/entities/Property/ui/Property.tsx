@@ -13,7 +13,7 @@ export const Property = ({text, color, icon: Icon, iconSize = 16, iconColor = 'c
     return (
         <div className="flex items-center justify-center gap-2">
             <span className={`${color} px-3 py-1 rounded-2xl`}>
-                <div className="flex gap-1 items-center">
+                <div className="flex gap-1 items-center text-white">
                     {Icon && <Icon size={iconSize} color={iconColor} />}
                     {text}
                 </div>
