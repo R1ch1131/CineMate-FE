@@ -1,0 +1,1 @@
+export { HotDebate } from "./ui/HotDebate";
