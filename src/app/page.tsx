@@ -7,6 +7,7 @@ import Link from "next/link";
 import { BookOpen, Flame, Newspaper } from "lucide-react";
 import { Property } from "~/entities/Property";
 import { SideBar } from "~/features/SideBar";
+import { Reviews } from "~/widgets/Reviews";
 
 export default function HomePage() {
   return (
@@ -29,7 +30,7 @@ export default function HomePage() {
         <div className="pb-15">
         <StatsBlock />
         </div>
-        <div className="w-full max-w-6xl flex gap-8">
+        <div className="w-full max-w-7xl flex gap-8">
           <div className="flex-1 flex flex-col gap-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -41,7 +42,7 @@ export default function HomePage() {
                 <p className="text-lightorange">Смотреть все &gt;</p>
               </Link>
             </div>
-            <div className="flex gap-5 justify-center">
+            <div className="grid grid-cols-4">
               <FilmCard />
               <FilmCard />
               <FilmCard />
@@ -56,10 +57,14 @@ export default function HomePage() {
               <Link href="/reviews">
                 <p className="text-lightorange">Все рецензии &gt;</p>
               </Link>
+              
             </div>
-            
-            <div className="h-96 w-full">
-            </div>
+             <div className="flex flex-col gap-5 py-5">
+                            <Reviews />
+                            <Reviews />
+                            <Reviews />
+                            <Reviews />
+                          </div>
           </div>
           <SideBar />
         </div>
