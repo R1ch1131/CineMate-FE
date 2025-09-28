@@ -3,6 +3,7 @@ import { BookOpen, Crown, Edit3, Film, Heart, Users } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 import { ProfileStats } from "~/entities/ProfileStats";
+import { ProfileLikeTab } from "~/features/ProfileLikeTab";
 import { ProfileReviewsTab } from "~/features/ProfileReviewsTab";
 import { ProfileViewTab } from "~/features/ProfileViewTab";
 import Ava from "~/shared/assets/icons/actor.jpg";
@@ -70,7 +71,7 @@ export const ProfileCard = ({ name, description, date }: ProfileCardProps) => {
                  <ProfileReviewsTab />
                 </TabPanel>
                 <TabPanel>
-                  3
+                  <ProfileLikeTab />
                 </TabPanel>
                 <TabPanel>
                   4
