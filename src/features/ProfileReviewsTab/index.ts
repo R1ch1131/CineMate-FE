@@ -1,0 +1,1 @@
+export { ProfileReviewsTab } from "./ui/ProfileReviewsTab";
