@@ -25,7 +25,7 @@ export const ProfileReviewsTab = () => {
 
   return (
     <div className="pt-2">
-      <div className="bg-glass flex items-center justify-between rounded-2xl p-7">
+      <div className="bg-glass flex items-center border border-frostedglass justify-between rounded-2xl p-7">
         <div className="flex flex-col gap-3">
           <p className="text-white text-2xl font-bold">Мои рецензии</p>
           <p className="text-grey">Всего написано 1 рецензий</p>

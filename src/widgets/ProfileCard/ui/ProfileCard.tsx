@@ -6,6 +6,7 @@ import { ProfileStats } from "~/entities/ProfileStats";
 import { ProfileDebateTab } from "~/features/ProfileDebateTab";
 import { ProfileLikeTab } from "~/features/ProfileLikeTab";
 import { ProfileReviewsTab } from "~/features/ProfileReviewsTab";
+import { ProfileSettingTab } from "~/features/ProfileSettingTab";
 import { ProfileViewTab } from "~/features/ProfileViewTab";
 import Ava from "~/shared/assets/icons/actor.jpg";
 
@@ -16,7 +17,7 @@ interface ProfileCardProps {
 }
 
 const tabStyle =
-  "w-1/12 py-2.5 2k:py-3.5 rounded-xl text-grey from-lightorange to-darkorange duration-200 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:text-white data-hover:bg-frostedglass data-selected:bg-gradient-to-r data-selected:text-white";
+  "px-8 ml-3 py-2.5 2k:py-3.5 rounded-xl text-grey from-lightorange to-darkorange duration-200 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:text-white data-hover:bg-frostedglass data-selected:bg-gradient-to-r data-selected:text-white";
 
 
 export const ProfileCard = ({ name, description, date }: ProfileCardProps) => {
@@ -44,8 +45,8 @@ export const ProfileCard = ({ name, description, date }: ProfileCardProps) => {
         </div>
       </div>
       <div className="flex gap-6">
-        <div className="mt-5 flex h-10 w-35 items-center justify-center gap-2 rounded-full bg-purple-500/60">
-          <Crown className="h-4 w-4 text-amber-500" />
+        <div className="mt-5 flex h-10 w-35 items-center justify-center gap-2 text-amber-500 rounded-full bg-purple-500/40 border border-purple-500">
+          <Crown className="h-4 w-4 " />
           <p>enthusiast</p>
         </div>
         <div className="flex-1 gap-3 grid grid-cols-4">
@@ -57,8 +58,8 @@ export const ProfileCard = ({ name, description, date }: ProfileCardProps) => {
       </div>
       </div>
       <TabGroup className="pt-8">
-              <TabList className="bg-glass flex h-13 2k:h-15 items-center rounded-xl">
-                <Tab className={`${tabStyle}`}>Обзор1</Tab>
+              <TabList className="bg-glass flex h-15 2k:h-17 items-center rounded-xl">
+                <Tab className={`${tabStyle}`}>Обзор</Tab>
                 <Tab className={`${tabStyle}`}>Рецензии</Tab>
                 <Tab className={`${tabStyle}`}>Избранное</Tab>
                 <Tab className={`${tabStyle}`}>Споры</Tab>
@@ -78,7 +79,7 @@ export const ProfileCard = ({ name, description, date }: ProfileCardProps) => {
                   <ProfileDebateTab />
                 </TabPanel>
                 <TabPanel>
-                  5
+                 <ProfileSettingTab />
                 </TabPanel>
               </TabPanels>
             </TabGroup>
