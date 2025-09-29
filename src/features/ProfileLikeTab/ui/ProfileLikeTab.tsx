@@ -5,10 +5,10 @@ export const ProfileLikeTab = () =>{
     return(
         <div className="pt-3">
             <div className="flex justify-between ">
-            <p className="text-white text-3xl pb-6">Избранные рецензии</p>
+            <p className="text-white font-bold text-3xl pb-6">Избранные рецензии</p>
             <p className="text-grey">1 Рецензия</p>
             </div>
-            <div className="bg-glass rounded-2xl p-6 flex flex-col gap-2 text-grey">
+            <div className="bg-glass border border-frostedglass rounded-2xl p-6 flex flex-col gap-2 text-grey">
                 <div className="flex justify-between ">
                 <p className="text-white">Дюна: Часть вторая</p>
                 <span className="flex gap-2 items-center text-amber-500">

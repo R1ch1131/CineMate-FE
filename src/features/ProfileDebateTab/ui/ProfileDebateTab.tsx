@@ -12,7 +12,7 @@ export const ProfileDebateTab = () =>{
                     <p>Создать спор</p>
                 </div>
             </span>
-            <div className="bg-glass p-5 rounded-2xl">
+            <div className="bg-glass p-5 border border-frostedglass rounded-2xl">
             <div className="flex justify-between items-center pb-2">
                 <span className="flex gap-1 items-center">
                     <p className="text-white">Дюна vs Бегущий по лезвию: что лучше?</p>
