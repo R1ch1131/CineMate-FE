@@ -1,0 +1,1 @@
+export { Componovka } from "./ui/Componovka";
