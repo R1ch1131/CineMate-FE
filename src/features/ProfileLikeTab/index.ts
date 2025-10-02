@@ -1,0 +1,1 @@
+export { ProfileLikeTab } from "./ui/ProfileLikeTab";

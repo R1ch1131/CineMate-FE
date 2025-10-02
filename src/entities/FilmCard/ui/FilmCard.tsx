@@ -27,7 +27,7 @@ export const FilmCard = () => {
         </div>
         <div className="p-1 text-white">
           <p>Дюна: часть вторая</p>
-          <div className="flex justify-between">
+          <div className="flex gap-22">
             <p className="">2024</p>
             <div className="flex justify-center items-center gap-1">
              <MessageCircle className="w-4 h-4" />

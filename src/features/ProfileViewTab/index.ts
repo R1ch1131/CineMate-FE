@@ -1,0 +1,1 @@
+export { ProfileViewTab } from "./ui/ProfileViewTab";

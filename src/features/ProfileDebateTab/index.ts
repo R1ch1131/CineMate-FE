@@ -1,0 +1,1 @@
+export { ProfileDebateTab } from "./ui/ProfileDebateTab";

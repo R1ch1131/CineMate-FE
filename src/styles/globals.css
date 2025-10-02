@@ -6,7 +6,7 @@
 
   --color-darkblue: rgb(2 6 24);
   --color-lightblue: rgb(22 36 85);
-  --color-lightorange: rgb(221 122 28);
+  --color-lightorange: rgb(254, 152, 0);
   --color-darkorange: rgb(244 74 0);
   --color-grey: rgb(152 160 174);
   --color-glass: rgba(255, 255, 255,.060);
@@ -37,6 +37,12 @@
   animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+@layer base {
+  body {
+    @apply text-white 
+  }
+}
+
 @layer components {
   .gradient {
    @apply bg-gradient-to-r from-lightorange to-darkorange bg-clip-text text-transparent
@@ -52,6 +58,14 @@
         display: none;
     }
     
+  .bg-gradient {
+    @apply bg-gradient-to-r from-lightorange to-darkorange
+  }
+
+  .center{
+    @apply justify-center items-center
+  }
+
   .tabClassname {
     @apply text-grey from-lightorange to-darkorange rounded-xl px-4 py-2 duration-200 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:text-white data-selected:bg-gradient-to-r data-selected:text-white
   }
