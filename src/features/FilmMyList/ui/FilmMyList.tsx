@@ -7,7 +7,11 @@ import { ChevronDown, Dot, Star, Target, Trash2 } from "lucide-react";
 import { FilmMyListStatus } from "./FilmMyListStatus";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 
-export const FilmMyList = () => {
+interface FilmMyListProps {
+  film: { title: string; rating: number; year: number };
+}
+
+export const FilmMyList: React.FC<FilmMyListProps> = ({ film }) => {
   const [selectedOption, setSelectedOption] = useState({
     label: "Хочу посмотреть",
     value: "date",
@@ -39,17 +43,17 @@ export const FilmMyList = () => {
         src={Film}
         alt="Фильм"
       />
-      <p>Дюна: Часть вторая</p>
+      <p>{film.title}</p>
 
       <div className="flex flex-col gap-2">
         <div className="flex">
           <span className="flex gap-1.5 text-lightorange">
             <Star className="fill-current" />
-            <p>8.4</p>
+            <p>{film.rating}</p>
           </span>
           <span className="text-grey flex ">
             <Dot />
-            <p>2023</p>
+            <p>{film.year}</p>
           </span>
         </div>
         <div className="flex">
@@ -76,10 +80,10 @@ export const FilmMyList = () => {
             <div className="flex">
               <span className="flex gap-1.5 center text-white">
                 <Star className="text-lightorange fill-current h-5 w-5" />
-                <p>8.4</p>
+                <p>{film.rating}</p>
               </span>
               <Dot className="text-grey" />
-              <p className="text-grey">2023</p>
+              <p className="text-grey">{film.year}</p>
             </div>
 
             <div className="flex gap-5">
