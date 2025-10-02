@@ -1,1 +1,1 @@
-export { Componovka } from "./ui/Componovka";
+export { FilmGrid } from "./ui/FilmGrid";
