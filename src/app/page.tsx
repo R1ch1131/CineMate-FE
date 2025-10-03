@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { StatsBlock } from "~/entities/StatsBlock/ui/StatsBlock";
 import { CONSTANTS } from "~/shared/lib/strings";
@@ -7,36 +7,37 @@ import Link from "next/link";
 import { BookOpen, Flame, Newspaper } from "lucide-react";
 import { Property } from "~/entities/Property";
 import { SideBar } from "~/features/SideBar";
-import { Reviews } from "~/widgets/Reviews";
+import { Reviews } from "~/features/Reviews";
 
 export default function HomePage() {
   return (
     <main>
       <div className="flex flex-col items-center gap-5">
-        <div className="flex justify-center items-center gap-3">
-          <Newspaper className="w-8 h-8 text-amber-500" />
+        <div className="flex items-center justify-center gap-3">
+          <Newspaper className="h-8 w-8 text-amber-500" />
           <p className="text-lightorange text-2xl">{CONSTANTS.mainPage.news}</p>
         </div>
         <p className="text-5xl font-bold">
-          <span className="text-white">{CONSTANTS.mainPage.all} </span>  
+          <span className="text-white">{CONSTANTS.mainPage.all} </span>
           <span className="gradient">{CONSTANTS.mainPage.cinema}</span>
         </p>
-        <div className="flex flex-col justify-center items-center gap-2">
-          <p className="text-grey">
-            {CONSTANTS.mainPage.newRewiews}
-          </p>
+        <div className="flex flex-col items-center justify-center gap-2">
+          <p className="text-grey">{CONSTANTS.mainPage.newRewiews}</p>
           <p className="text-grey">{CONSTANTS.mainPage.filmfan}</p>
         </div>
         <div className="pb-15">
-        <StatsBlock />
+          <StatsBlock />
         </div>
-        <div className="w-full max-w-7xl flex gap-8">
-          <div className="flex-1 flex flex-col gap-5">
+        <div className="flex w-full max-w-7xl gap-8">
+          <div className="flex flex-1 flex-col gap-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Flame className="w-8 h-8 text-red-500" />
-                <p className="text-white text-3xl font-bold">Новинки кино</p>
-                <Property text={"Горячее"} color={"bg-red-500/20 text-red-400"} />
+                <Flame className="h-8 w-8 text-red-500" />
+                <p className="text-3xl font-bold text-white">Новинки кино</p>
+                <Property
+                  text={"Горячее"}
+                  color={"bg-red-500/20 text-red-400"}
+                />
               </div>
               <Link href="/movies">
                 <p className="text-lightorange">Смотреть все &gt;</p>
@@ -48,23 +49,25 @@ export default function HomePage() {
               <FilmCard />
               <FilmCard />
             </div>
-            <div className="flex items-center justify-between mt-8">
+            <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <BookOpen className="w-8 h-8 text-green-500" />
-                <p className="text-white text-3xl font-bold">Свежие рецензии</p>
-                <Property text={"Обновлено"} color={"bg-green-500/20 text-green-400"} />
+                <BookOpen className="h-8 w-8 text-green-500" />
+                <p className="text-3xl font-bold text-white">Свежие рецензии</p>
+                <Property
+                  text={"Обновлено"}
+                  color={"bg-green-500/20 text-green-400"}
+                />
               </div>
               <Link href="/reviews">
                 <p className="text-lightorange">Все рецензии &gt;</p>
               </Link>
-              
             </div>
-             <div className="flex flex-col gap-5 py-5">
-                            <Reviews />
-                            <Reviews />
-                            <Reviews />
-                            <Reviews />
-                          </div>
+            <div className="flex flex-col gap-5 py-5">
+              <Reviews />
+              <Reviews />
+              <Reviews />
+              <Reviews />
+            </div>
           </div>
           <SideBar />
         </div>
