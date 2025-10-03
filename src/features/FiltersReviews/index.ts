@@ -1,1 +1,0 @@
-export { FiltersReviews } from "./ui/FiltersReviews";
