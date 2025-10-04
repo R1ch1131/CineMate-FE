@@ -40,7 +40,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
             <MenuItem key={option.value}>
               {({ focus }) => (
                 <button
-                  className={`block w-full px-4 py-1 text-left text-sm ${
+                  className={`block w-full px-4 py-1 text-left text-sm text-white ${
                     focus ? "rounded-xl bg-blue-600 text-white" : ""
                   }`}
                   onClick={() => {

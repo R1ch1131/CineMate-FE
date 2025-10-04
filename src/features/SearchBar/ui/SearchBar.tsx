@@ -42,16 +42,16 @@ export const CategoryBlock: React.FC = () => {
               className={`h-4 w-4 text-gray-400 transition-transform ${isExpanded ? "rotate-180" : "rotate-0"}`}
             />
           </button>
-          <div className="flex rounded-xl border border-white/10 bg-white/5 p-1">
+          <div className="flex rounded-xl border border-white/10 bg-white/5 p-2">
             <button
               className={`transform rounded-lg p-3 text-gray-400 transition-all hover:scale-105`}
             >
-              <Grid2x2 className="h-4 w-4" />
+              <Grid2x2 className="h-5 w-5" />
             </button>
             <button
               className={`transform rounded-lg p-3 text-gray-400 transition-all hover:scale-105`}
             >
-              <TextAlignJustify className="h-4 w-4" />
+              <TextAlignJustify className="h-5 w-5" />
             </button>
           </div>
         </div>
