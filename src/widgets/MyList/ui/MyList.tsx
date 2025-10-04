@@ -9,6 +9,7 @@ import { SearchBar } from "./SearchBar";
 import { SortMenu } from "./SortMenu";
 import { FilmGrid } from "~/features/FilmMyList";
 import { TABS, TAB_STYLE } from "../lib/constants";
+import Link from "next/link";
 
 export const MyList = () => {
   
@@ -75,10 +76,12 @@ export const MyList = () => {
                     <span className="text-white">{filteredFilms.length}</span>{" "}
                     фильма
                   </p>
-                  <div className="bg-gradient flex items-center justify-center gap-1 rounded-xl p-2">
+                  <Link href='/movies'>
+                  <button className="bg-gradient flex items-center justify-center gap-1 rounded-xl p-2">
                     <Plus className="h-4 w-4" />
                     <p>Добавить фильм</p>
-                  </div>
+                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
