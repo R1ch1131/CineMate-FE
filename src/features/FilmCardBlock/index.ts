@@ -1,0 +1,1 @@
+export { FilmCardBlock } from "./ui/FilmCardBlock";
