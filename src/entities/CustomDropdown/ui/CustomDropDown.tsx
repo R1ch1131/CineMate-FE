@@ -1,6 +1,12 @@
 import React from "react";
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { ChevronDown } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 import { type SetStateAction } from "react";
 
 interface Option {
@@ -26,34 +32,30 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
       <label className="mb-3 block text-sm font-medium text-white">
         {label}
       </label>
-      <Menu>
-        <MenuButton className="flex w-full justify-between rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-left text-white transition-all duration-200 hover:bg-white/20 focus:outline-none">
-          {selected.label}
-          <ChevronDown className="h-5 w-5" />
-        </MenuButton>
-        <MenuItems
-          transition
-          anchor="bottom"
-          className="bg-darkblue z-10 mt-1 w-73 origin-top rounded-xl shadow-md transition duration-200 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
-        >
-          {options.map((option) => (
-            <MenuItem key={option.value}>
-              {({ focus }) => (
-                <button
-                  className={`block w-full px-4 py-1 text-left text-sm text-white ${
-                    focus ? "rounded-xl bg-blue-600 text-white" : ""
-                  }`}
-                  onClick={() => {
-                    setSelected(option);
-                  }}
-                >
-                  {option.label}
-                </button>
-              )}
-            </MenuItem>
-          ))}
-        </MenuItems>
-      </Menu>
+      <Select
+        value={selected.value}
+        onValueChange={(value) => {
+          const newOption = options.find((opt) => opt.value === value);
+          if (newOption) setSelected(newOption);
+        }}
+      >
+        <SelectTrigger className="w-full rounded-xl border border-white/20 bg-white/10 px-5 py-6 text-left text-white transition-all duration-200 hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className="p2 rounded-xl border border-white/20 bg-black/80 text-left text-white transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
+          <SelectGroup>
+            {options.map((option) => (
+              <SelectItem
+                key={option.value}
+                value={option.value}
+                className="block w-full px-4 py-1 text-left text-sm text-white transition-all duration-200 hover:bg-blue-600/20 focus-visible:rounded-xl focus-visible:bg-blue-600 focus-visible:text-white data-[state=checked]:bg-blue-600 data-[state=checked]:text-white"
+              >
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
     </div>
   );
 };

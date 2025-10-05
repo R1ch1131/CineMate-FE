@@ -1,20 +1,17 @@
 "use client";
 import React from "react";
 import { Filters } from "~/entities/Filters";
-import {
-  Sparkles,
-  Flame,
-  Crown,
-  Target,
-  Search,
-  ChevronDown,
-  TextAlignJustify,
-  Grid2x2,
-} from "lucide-react";
+import { Search, ChevronDown, TextAlignJustify, Grid2x2 } from "lucide-react";
 import { CategoryTile } from "~/entities/CategoryTile";
 import { useState } from "react";
-
-export const CategoryBlock: React.FC = () => {
+interface CategoryBlockProps {
+  onToggleView: () => void;
+  currentView: "grid" | "list";
+}
+export const CategoryBlock: React.FC<CategoryBlockProps> = ({
+  onToggleView,
+  currentView,
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -44,12 +41,14 @@ export const CategoryBlock: React.FC = () => {
           </button>
           <div className="flex rounded-xl border border-white/10 bg-white/5 p-2">
             <button
-              className={`transform rounded-lg p-3 text-gray-400 transition-all hover:scale-105`}
+              onClick={onToggleView}
+              className={`${currentView === "grid" ? "bg-amber-500 text-white" : "text-gray-400 hover:text-white"} transform rounded-lg p-3 transition-all hover:scale-105`}
             >
               <Grid2x2 className="h-5 w-5" />
             </button>
             <button
-              className={`transform rounded-lg p-3 text-gray-400 transition-all hover:scale-105`}
+              onClick={onToggleView}
+              className={`${currentView === "list" ? "bg-amber-500 text-white" : "text-gray-400 hover:text-white"} transform rounded-lg p-3 text-gray-400 transition-all hover:scale-105`}
             >
               <TextAlignJustify className="h-5 w-5" />
             </button>

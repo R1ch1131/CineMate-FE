@@ -2,8 +2,14 @@
 
 import { Search } from "lucide-react";
 import { CategoryBlock } from "~/features/SearchBar";
+import { FilmCardBlock } from "~/features/FilmCardBlock";
+import { useState } from "react";
 
 export default function HomePage() {
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const toggleViewMode = () => {
+    setViewMode((prev) => (prev === "grid" ? "list" : "grid"));
+  };
   return (
     <main>
       <section>
@@ -29,11 +35,11 @@ export default function HomePage() {
       </section>
       <section>
         <div className="mx-auto flex max-w-7xl flex-col gap-4">
-          <CategoryBlock />
+          <CategoryBlock onToggleView={toggleViewMode} currentView={viewMode} />
         </div>
       </section>
       <section>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"></div>
+        <FilmCardBlock viewMode={viewMode} />
       </section>
     </main>
   );
