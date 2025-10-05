@@ -4,11 +4,12 @@ import React from "react";
 interface FilmMyListStatusProps{
     icon: LucideIcon,
     text: string
+    color: string
 }
 
-export const FilmMyListStatus = ({icon:Icon ,text}: FilmMyListStatusProps) =>{
+export const FilmMyListStatus = ({icon:Icon ,text, color}: FilmMyListStatusProps) =>{
     return(
-        <div className="bg-blue-500/40 rounded-lg border border-blue-500 flex center px-2 py-1 gap-1 text-blue-300">
+        <div className={`rounded-lg border flex center px-2 py-1 gap-1 ${color} `}>
            {Icon && <Icon className={`h-3 w-3 `} />}
            <p className="text-xs">{text}</p>
         </div>

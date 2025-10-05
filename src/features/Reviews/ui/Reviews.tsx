@@ -4,17 +4,7 @@ import Film from "~/shared/assets/icons/filmImage.jpg";
 import User from "~/shared/assets/icons/actor.jpg";
 import Link from "next/link";
 import { Property } from "~/entities/Property";
-import {
-  Bookmark,
-  Calendar,
-  Flag,
-  Flame,
-  Heart,
-  MessageCircle,
-  MoreHorizontal,
-  Share2,
-  Star,
-} from "lucide-react";
+import { Bookmark, Calendar, Flag, Flame, Heart, MessageCircle, MoreHorizontal, Share2, Star} from "lucide-react";
 
 export const Reviews = () => {
   return (
