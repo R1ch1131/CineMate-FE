@@ -1,0 +1,1 @@
+export { FilmGenre } from "./ui/FilmGenre";
