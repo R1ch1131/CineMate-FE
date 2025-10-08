@@ -19,7 +19,7 @@ export const FilmGrid: React.FC<FilmGridProps> = ({ films: initialFilms }) => {
   };
 
   return (
-    <div className="grid grid-cols-5 gap-6 pt-5">
+    <div className="grid grid-cols-5 2k:grid-cols-6 pt-5">
       {films.map((film, index) => (
         <FilmMyList
           key={index}

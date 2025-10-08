@@ -65,13 +65,11 @@ export default function HomePage() {
               </Link>
             </div>
             <div className="flex flex-col gap-5 py-5">
-              <Reviews />
-              <Reviews />
-              <Reviews />
-              <Reviews />
+              
             </div>
           </div>
           <SideBar />
+          
         </div>
       </div>
     </main>
