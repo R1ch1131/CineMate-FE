@@ -1,3 +1,5 @@
+'use client'
+
 import { ReviewPage } from "~/widgets/ReviewPage";
 
 export default function HomePage() {
