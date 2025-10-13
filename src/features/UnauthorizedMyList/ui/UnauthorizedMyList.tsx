@@ -4,7 +4,7 @@ import React from "react";
 
 export const UnauthorizedMyList = () =>{
     return(
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center min-h-[calc(100vh-110px)]">
           <div className="flex flex-col justify-center items-center gap-4">
             <div className="bg-gradient-to-r from-lightorange to-darkorange rounded-3xl h-24 w-25 flex items-center justify-center">
             <Bookmark className="h-13 w-13 text-white"  />

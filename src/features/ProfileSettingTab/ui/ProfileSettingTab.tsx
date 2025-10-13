@@ -1,10 +1,17 @@
-import { Description, Field, Input, Label, Textarea } from "@headlessui/react";
-import { Edit3, LogOut, Shield, User } from "lucide-react";
+'use client'
+
+import { Description, Field, Input, Textarea } from "@headlessui/react";
+import { Edit3, LogOut, Shield } from "lucide-react";
 import Image from "next/image";
 import React from "react";
-import Actor from "~/shared/assets/icons/actor.jpg";
+import noAvatar from "~/shared/assets/icons/noAvatar.jpg";
+import {signOut} from 'next-auth/react'
+import {useSession} from 'next-auth/react'
 
 export const ProfileSettingTab = () => {
+
+  const session = useSession()
+  
   return (
     <div className="flex gap-7 py-5">
       <div className="w-9/12">
@@ -15,11 +22,15 @@ export const ProfileSettingTab = () => {
           </div>
           <div className="flex items-center gap-4">
             <div>
-              <Image
+                {session?.data?.user?.image ? ( <img
                 className="h-25 w-25 rounded-2xl object-cover"
-                src={Actor}
+                src={session.data.user.image}
                 alt="ava"
-              />
+              />) : ( <Image
+                className="h-25 w-25 rounded-2xl object-cover"
+                src={noAvatar}
+                alt="ava"
+              />)}
             </div>
             <div className="flex flex-col gap-1">
               <p className="text-white text-lg font-bold">Фото профиля</p>
@@ -119,13 +130,19 @@ export const ProfileSettingTab = () => {
         </div>
       </div>
       <div className="bg-glass rounded-2xl border border-frostedglass py-5 px-6">
-        <div className="flex items-center gap-3 bg-red-500/10 border border-red-500/20 p-4 rounded-2xl">
+
+        {session?.data ? (
+        <button onClick={() => signOut({ 
+          callbackUrl: '/'})} 
+          className="flex center gap-3 w-full bg-red-500/10 border border-red-500/20 p-4 rounded-2xl">
             <LogOut className="text-red-400"/>
             <div className="flex flex-col gap-1">
                 <p className="text-red-400">Выйти из аккаунта</p>
                 <p className="text-red-300/70 text-sm">Завершить сессию</p>
             </div>
-        </div>
+        </button>
+        ): ('')
+        }
       </div>
       </div>
     </div>
