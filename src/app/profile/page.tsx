@@ -4,7 +4,7 @@ export default function HomePage() {
   return (
     <main>
       <div className="flex justify-center">
-      <ProfileCard name={"cfyz"} description={"Киноман и критик"} date={"январь 2024 г."} />
+      <ProfileCard description={"Киноман и критик"} date={"январь 2024 г."} />
       </div>
     </main>
   );

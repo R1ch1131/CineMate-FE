@@ -7,6 +7,8 @@ import { AuthButton } from "~/shared/ui/authButton/ui/authButton";
 import Image from "next/image";
 import logoImage from "~/shared/assets/icons/cinemateLogo.svg";
 import { useActivePath } from "~/shared/lib/hooks/useActivePath";
+import {useSession} from 'next-auth/react'
+import { ProfileButton } from "~/shared/ui/ProfileButton/ui/ProfileButton";
 
 const activelinkClass =
   "text-lightorange transition-transform hover:-translate-y-1 gradient-border active";
@@ -16,6 +18,9 @@ const hoverLinkClass =
 const HIDDEN_PATHS = ["/auth"];
 
 export const TopBar = () => {
+
+  const session = useSession()
+
   const activeLink = useActivePath();
 
   if (HIDDEN_PATHS.includes(activeLink)) {
@@ -55,9 +60,13 @@ export const TopBar = () => {
         </Link>
       </div>
       <div className="flex flex-1 justify-end ">
-        <Link href="/auth">
-          <AuthButton text="Вход" />
-        </Link>
+        {session?.data ? (
+ <ProfileButton />
+) : (
+  <Link href="/auth">
+    <AuthButton text="Вход" />
+  </Link>
+)}
       </div>
     </div>
   );
