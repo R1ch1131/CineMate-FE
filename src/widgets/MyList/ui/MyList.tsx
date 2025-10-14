@@ -40,7 +40,7 @@ export const MyList = () => {
         <div className="w-7/12">
           <TabGroup selectedIndex={selectedTab} onChange={setSelectedTab}>
             <TabList className="bg-glass mb-10 flex h-15 items-center rounded-xl">
-              {TABS.map((tab, i) => (
+              {TABS.map((tab) => (
                 <Tab key={tab.status} className={TAB_STYLE}>
                   <span className="flex gap-2">
                     <tab.icon className="h-5 w-5" />

@@ -1,7 +1,5 @@
 import React from "react";
 import { Field, Input } from '@headlessui/react'
-import Image from 'next/image';
-import profileImage from '~/shared/assets/icons/profile.svg';
 import type { UseFormRegisterReturn } from "react-hook-form";
 import { User } from 'lucide-react';
 

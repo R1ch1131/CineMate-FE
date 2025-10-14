@@ -10,9 +10,9 @@ import { Filter } from "lucide-react";
 export const ReviewPage = () => {
   const [activeTab, setActiveTab] = useState(0);
 
-  const currentReviewsCount = TAB_DATA[activeTab]?.length || 0;
+  const currentReviewsCount = TAB_DATA[activeTab]?.length ?? 0;
   
-  const currentTabName = REVIEW_TABS[activeTab]?.name || "Все рецензии";
+  const currentTabName = REVIEW_TABS[activeTab]?.name ?? "Все рецензии";
 
   return (
     <div>

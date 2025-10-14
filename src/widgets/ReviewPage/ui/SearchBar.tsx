@@ -1,7 +1,7 @@
 "use client";
 
 import { Field, Input } from "@headlessui/react";
-import { BookOpen, ChevronDown, Eye, Search } from "lucide-react";
+import { BookOpen, ChevronDown, Search } from "lucide-react";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { useState, type SetStateAction } from "react";
 
