@@ -27,7 +27,7 @@ const session = useSession()
                 src={noAvatar}
                 alt="ava"
               />)}
-                <p>{session.data?.user?.name}</p>
+                <p>{emailWithoutDomain}</p>
             </Link>
         </div>
     )

@@ -1,1 +1,0 @@
-export { TrendTheme } from "./ui/TrendTheme";

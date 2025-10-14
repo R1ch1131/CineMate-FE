@@ -91,7 +91,7 @@ async function refreshAccessToken(token: any) {
     const data = await res.json();
 
     if (!res.ok) {
-      throw new Error(data.error || "Ошибка обновления токена");
+      throw new Error(data.error ?? "Ошибка обновления токена");
     }
 
     const expiresIn = data.expiresIn ?? 15 * 60;

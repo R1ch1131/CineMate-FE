@@ -16,6 +16,17 @@ interface RegisterFormData {
   confirmPassword: string;
 }
 
+// Тип для ответа от API регистрации
+interface RegisterResponse {
+  message?: string;
+  user?: {
+    id: string;
+    email: string;
+    username: string;
+  };
+  error?: string;
+}
+
 export const RegisterForm = () => {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -29,52 +40,52 @@ export const RegisterForm = () => {
 
   const password = watch("password");
 
- const onRegisterSubmit = async (data: RegisterFormData) => {
-  setErrorMessage(null);
+  const onRegisterSubmit = async (data: RegisterFormData) => {
+    setErrorMessage(null);
 
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: data.name,
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: data.name,
+          email: data.email,
+          password: data.password,
+        }),
+      });
+
+      let result: RegisterResponse;
+      try {
+        result = await res.json() as RegisterResponse;
+      } catch {
+        // Если ответ не в JSON формате, создаем объект с текстом
+        const text = await res.text();
+        result = { message: text };
+      }
+
+      if (!res.ok) {
+        throw new Error(result.message ?? result.error ?? "Ошибка регистрации");
+      }
+
+      const signInRes = await signIn("credentials", {
+        redirect: false,
         email: data.email,
         password: data.password,
-      }),
-    });
+      });
 
-    let result: any;
-    try {
-      result = await res.json();
-    } catch {
-      const text = await res.text();
-      result = { message: text };
+      if (signInRes?.error) {
+        throw new Error("Ошибка входа после регистрации");
+      }
+
+      router.push("/profile");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setErrorMessage(err.message);
+      } else {
+        setErrorMessage("Неизвестная ошибка при регистрации");
+      }
     }
-
-    if (!res.ok) {
-      throw new Error(result.message || "Ошибка регистрации");
-    }
-
-    const signInRes = await signIn("credentials", {
-      redirect: false,
-      email: data.email,
-      password: data.password,
-    });
-
-    if (signInRes?.error) {
-      throw new Error("Ошибка входа после регистрации");
-    }
-
-    router.push("/profile");
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      setErrorMessage(err.message);
-    } else {
-      setErrorMessage("Неизвестная ошибка при регистрации");
-    }
-  }
-};
-
+  };
 
   return (
     <form

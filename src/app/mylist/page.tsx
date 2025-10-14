@@ -8,5 +8,5 @@ import { MyList } from "~/widgets/MyList";
 export default function HomePage() {
   const session = useSession();
 
-  return <div>{session?.data ?  <MyList /> :<UnauthorizedMyList />}</div>;
+  return <div>{session?.data ?  <MyList /> : <UnauthorizedMyList />}</div>;
 }
