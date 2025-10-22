@@ -9,16 +9,17 @@ import {
   Eye,
   UserPlus,
   Share2,
+  BookOpen,
+  Users,
+  BarChart3,
+  ArrowLeft,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import React from "react";
+import { useRouter } from "next/navigation";
 import { UserStats } from "~/entities/UserStats";
-import { ProfileDebateTab } from "~/features/ProfileDebateTab";
-import { ProfileLikeTab } from "~/features/ProfileLikeTab";
-import { ProfileReviewsTab } from "~/features/ProfileReviewsTab";
-import { ProfileSettingTab } from "~/features/ProfileSettingTab";
-import { ProfileViewTab } from "~/features/ProfileViewTab";
+import { UsersProfileReviewsTab } from "~/features/UsersProfileReviewsTab";
 import noAvatar from "~/shared/assets/icons/noAvatar.jpg";
 
 interface UserCardProps {
@@ -31,6 +32,7 @@ const tabStyle =
 
 export const UserCard = ({ description, displayName }: UserCardProps) => {
   const session = useSession();
+  const router = useRouter();
 
   const resolvedDisplayName =
     displayName ||
@@ -38,9 +40,20 @@ export const UserCard = ({ description, displayName }: UserCardProps) => {
     session.data?.user?.email?.split("@")[0] ||
     "Гость";
 
+  const handleGoBack = () => {
+    router.back();
+  };
+
   return (
-    <div className="2k:h-80 2k:w-5/12 flex w-280 flex-col gap-6">
-      <div className="border-grey/40 flex max-w-full items-start justify-between gap-6 overflow-hidden rounded-2xl border-1 bg-gradient-to-r from-amber-500/10 to-orange-500/10 p-8">
+    <div className="2k:h-80 2k:w-5/12 flex w-280 flex-col gap-7">
+      <button
+        onClick={handleGoBack}
+        className="flex w-fit items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-400 transition-all hover:scale-105 active:scale-95"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        <span>Назад</span>
+      </button>
+      <div className="flex max-w-full items-start justify-between gap-6 overflow-hidden rounded-2xl border-1 border-white/10 bg-gradient-to-r from-amber-500/10 to-orange-500/10 p-8">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-5">
             <div className="flex flex-col items-center">
@@ -122,30 +135,26 @@ export const UserCard = ({ description, displayName }: UserCardProps) => {
           </div>
         </div>
       </div>
-      <TabGroup className="pt-8">
-        <TabList className="bg-glass 2k:h-17 flex h-15 items-center rounded-xl">
-          <Tab className={`${tabStyle}`}>Обзор</Tab>
-          <Tab className={`${tabStyle}`}>Рецензии</Tab>
-          <Tab className={`${tabStyle}`}>Избранное</Tab>
-          <Tab className={`${tabStyle}`}>Споры</Tab>
-          <Tab className={`${tabStyle}`}>Настройки</Tab>
+      <TabGroup>
+        <TabList className="bg-glass 2k:h-17 flex h-15 items-center rounded-xl border-1 border-white/10">
+          <Tab className={`${tabStyle} flex gap-2`}>
+            <BookOpen />
+            Рецензии
+          </Tab>
+          <Tab className={`${tabStyle} flex gap-2`}>
+            <BarChart3 />
+            Статистика
+          </Tab>
+          <Tab className={`${tabStyle} flex gap-2`}>
+            <Users />О пользователе
+          </Tab>
         </TabList>
         <TabPanels className="mt-3">
           <TabPanel>
-            <ProfileViewTab />
+            <UsersProfileReviewsTab />
           </TabPanel>
-          <TabPanel>
-            <ProfileReviewsTab />
-          </TabPanel>
-          <TabPanel>
-            <ProfileLikeTab />
-          </TabPanel>
-          <TabPanel>
-            <ProfileDebateTab />
-          </TabPanel>
-          <TabPanel>
-            <ProfileSettingTab />
-          </TabPanel>
+          <TabPanel>{/* <UsersProfileStatsTab /> */}</TabPanel>
+          <TabPanel>{/* <UsersProfileAboutTab /> */}</TabPanel>
         </TabPanels>
       </TabGroup>
     </div>

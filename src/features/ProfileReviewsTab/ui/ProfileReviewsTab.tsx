@@ -25,16 +25,16 @@ export const ProfileReviewsTab = () => {
 
   return (
     <div className="pt-2">
-      <div className="bg-glass flex items-center border border-frostedglass justify-between rounded-2xl p-7">
+      <div className="bg-glass border-frostedglass flex items-center justify-between rounded-2xl border p-7">
         <div className="flex flex-col gap-3">
-          <p className="text-white text-2xl font-bold">Мои рецензии</p>
+          <p className="text-2xl font-bold text-white">Мои рецензии</p>
           <p className="text-grey">Всего написано 1 рецензий</p>
         </div>
         <div>
           <div className="flex gap-4">
             <div>
               <Menu>
-                <MenuButton className="bg-frostedglass border-grey flex w-40 justify-center items-center gap-1 rounded-xl border-2 py-2 text-white">
+                <MenuButton className="bg-frostedglass border-grey flex w-40 items-center justify-center gap-1 rounded-xl border-2 py-2 text-white">
                   {selectedOption.label}
                   <ChevronDown />
                 </MenuButton>
@@ -59,8 +59,7 @@ export const ProfileReviewsTab = () => {
           </div>
         </div>
       </div>
-      <div className="pt-6">
-      </div>
+      <div className="pt-6"></div>
     </div>
   );
 };

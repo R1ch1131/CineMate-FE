@@ -8,7 +8,7 @@ export const ProfileViewTab = () => {
       <div className="flex gap-7">
         <div className="w-2/3">
           <div className="flex flex-col gap-7">
-            <div className="bg-glass border-grey/40 h-75 rounded-2xl border shadow-xl">
+            <div className="bg-glass border-white/10 h-75 rounded-2xl border shadow-xl">
               <div className="flex items-center gap-3 p-6">
                 <Award className="h-6 w-6 text-amber-500" />
                 <p className="text-2xl font-bold text-white">Достижения</p>
