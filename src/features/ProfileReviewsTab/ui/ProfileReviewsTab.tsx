@@ -3,7 +3,6 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDown, Plus } from "lucide-react";
 import React, { useState, type SetStateAction } from "react";
-import { Reviews } from "~/features/Reviews";
 
 export const ProfileReviewsTab = () => {
   const [selectedOption, setSelectedOption] = useState({

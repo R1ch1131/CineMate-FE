@@ -1,8 +1,62 @@
 import { Calendar } from "lucide-react";
-import React from "react";
+import React, { type FC } from "react";
 import { NewFilmItem } from "./NewFilmItem";
+import Film1 from "~/shared/assets/icons/filmImage.jpg";
 
-export const NewFilm = () => {
+const mockFilms = [
+  {
+    image: Film1,
+    title: "Бегущий по лезвию 2099",
+    author: "Дени Вильнёв",
+    daysLeft: 23,
+    releaseDate: "15 ноября",
+    genre: "Sci-fi",
+    views: "12.4K",
+    rating: "Высокий",
+  },
+  {
+    image: Film1,
+    title: "Дюна: Часть вторая",
+    author: "Дени Вильнёв",
+    daysLeft: 23,
+    releaseDate: "15 ноября",
+    genre: "Sci-fi",
+    views: "12.4K",
+    rating: "Высокий",
+  },
+  {
+    image: Film1,
+    title: "Прибытие",
+    author: "Дени Вильнёв",
+    daysLeft: 23,
+    releaseDate: "15 ноября",
+    genre: "Sci-fi",
+    views: "12.4K",
+    rating: "Высокий",
+  },
+  {
+    image: Film1,
+    title: "Враг",
+    author: "Дени Вильнёв",
+    daysLeft: 23,
+    releaseDate: "15 ноября",
+    genre: "Sci-fi",
+    views: "12.4K",
+    rating: "Высокий",
+  },
+  {
+    image: Film1,
+    title: "Пленницы",
+    author: "Дени Вильнёв",
+    daysLeft: 23,
+    releaseDate: "15 ноября",
+    genre: "Sci-fi",
+    views: "12.4K",
+    rating: "Высокий",
+  },
+];
+
+export const NewFilm: FC = () => {
   return (
     <div className="bg-glass rounded-2xl p-6">
       <div className="flex justify-between items-center pb-5">
@@ -20,12 +74,19 @@ export const NewFilm = () => {
         </div>
       </div>
       <div className="flex flex-col gap-4">
-
-      <NewFilmItem />
-       <NewFilmItem />
-        <NewFilmItem />
-         <NewFilmItem />
-          <NewFilmItem />
+        {mockFilms.map((film, index) => (
+          <NewFilmItem
+            key={index}
+            image={film.image}
+            title={film.title}
+            author={film.author}
+            daysLeft={film.daysLeft}
+            releaseDate={film.releaseDate}
+            genre={film.genre}
+            views={film.views}
+            rating={film.rating}
+          />
+        ))}
       </div>
     </div>
   );
