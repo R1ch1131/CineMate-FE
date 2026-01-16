@@ -18,7 +18,9 @@ const session = useSession()
                 <Bell className="w-5 h-5"/>
             </div>
             <Link href='/profile' className="flex center gap-2 hover:bg-glass px-4 py-3 rounded-2xl">
-                {session?.data?.user?.image ? ( <img
+                {session?.data?.user?.image ? ( <Image
+                width={28}
+                height={28}
                 className="h-7 w-7 rounded-full"
                 src={session.data.user.image}
                 alt="ava"

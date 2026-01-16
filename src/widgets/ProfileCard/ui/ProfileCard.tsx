@@ -33,7 +33,9 @@ const emailWithoutDomain = session.data?.user?.email?.split('@')[0]
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-5">
             <div>
-              {session?.data?.user?.image ? ( <img
+              {session?.data?.user?.image ? ( <Image
+                width={140}
+                height={140}
                 className="h-35 w-35 rounded-full object-cover shadow-2xl shadow-amber-500/30"
                 src={session.data.user.image}
                 alt="ava"

@@ -22,7 +22,9 @@ export const ProfileSettingTab = () => {
           </div>
           <div className="flex items-center gap-4">
             <div>
-                {session?.data?.user?.image ? ( <img
+                {session?.data?.user?.image ? ( <Image
+                width={100}
+                height={100}
                 className="h-25 w-25 rounded-2xl object-cover"
                 src={session.data.user.image}
                 alt="ava"

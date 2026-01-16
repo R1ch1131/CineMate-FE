@@ -7,7 +7,6 @@ import Link from "next/link";
 import { BookOpen, Flame, Newspaper } from "lucide-react";
 import { Property } from "~/entities/Property";
 import { SideBar } from "~/features/SideBar";
-import { Reviews } from "~/features/Reviews";
 
 export default function HomePage() {
   return (
