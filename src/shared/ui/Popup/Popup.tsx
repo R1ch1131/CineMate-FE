@@ -53,7 +53,7 @@ export const Popup: React.FC<PopupProps> = ({ isOpen, onClose, children }) => {
 
   return (
     <div
-      className="bg-shadow fixed inset-0 z-50 flex items-center justify-center"
+      className="bg-shadow fixed inset-0 z-50 flex center"
       onClick={onClose}
     >
       <div
@@ -71,7 +71,7 @@ export const Popup: React.FC<PopupProps> = ({ isOpen, onClose, children }) => {
             </button>
           </div>
         </div>
-        <div className="invisible-scroll flex-1 overflow-y-auto p-6">
+        <div className="invisible-scroll flex-1 overflow-y-auto">
           {children}
         </div>
       </div>
