@@ -38,12 +38,12 @@ export const FilmMyList: React.FC<FilmMyListProps> = ({ film, onDelete }) => {
 
   return (
     <div
-      className="relative"
+      className="relative transition-all hover:scale-103"
       onMouseEnter={() => setIsActive(true)}
       onMouseLeave={() => setIsActive(false)}
     >
       <Image
-        className="h-88 w-57 rounded-2xl object-cover mb-3"
+        className="h-88 w-58 rounded-2xl object-cover mb-3"
         src={Film1}
         alt="Фильм"
       />

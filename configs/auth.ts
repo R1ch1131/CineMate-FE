@@ -110,3 +110,5 @@ async function refreshAccessToken(token: any) {
     };
   }
 }
+
+export const authOptions = authConfig;

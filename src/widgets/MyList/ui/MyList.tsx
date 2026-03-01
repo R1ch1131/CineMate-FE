@@ -1,4 +1,3 @@
-// features/MyList/ui/MyList.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -23,6 +22,10 @@ export const MyList = () => {
     { title: "Фильм 2", rating: 7.5, year: 2021, status: "watching" },
     { title: "Фильм 3", rating: 9.0, year: 2020, status: "watched" },
     { title: "Фильм 4", rating: 6.5, year: 2019, status: "delayed" },
+    { title: "Фильм 4", rating: 6.5, year: 2019, status: "delayed" },
+    { title: "Фильм 4", rating: 6.5, year: 2019, status: "delayed" },
+    { title: "Фильм 4", rating: 6.5, year: 2019, status: "delayed" },
+    { title: "Фильм 4", rating: 6.5, year: 2019, status: "delayed" },
   ]);
 
   const [selectedTab, setSelectedTab] = useState<number>(0);
@@ -37,7 +40,7 @@ export const MyList = () => {
     <div>
       <MyListHeader />
       <div className="center flex">
-        <div className="w-7/12">
+        <div className="w-8/12 2k:w-6/12">
           <TabGroup selectedIndex={selectedTab} onChange={setSelectedTab}>
             <TabList className="bg-glass mb-10 flex h-15 items-center rounded-xl">
               {TABS.map((tab) => (
@@ -77,7 +80,7 @@ export const MyList = () => {
                     фильма
                   </p>
                   <Link href='/movies'>
-                  <button className="bg-gradient flex items-center justify-center gap-1 rounded-xl p-2">
+                  <button className="bg-gradient flex items-center justify-center gap-1 rounded-xl py-2 px-3 transition-all hover:scale-103">
                     <Plus className="h-4 w-4" />
                     <p>Добавить фильм</p>
                   </button>

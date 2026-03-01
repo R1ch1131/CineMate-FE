@@ -125,17 +125,17 @@ export const RegisterForm = () => {
       />
 
       <PasswordInput
-        label="Пароль"
-        placeholder="Минимум 6 символов"
-        {...registerRegister("password", {
-          required: "Пароль обязателен",
-          minLength: {
-            value: 6,
-            message: "Пароль должен содержать минимум 6 символов",
-          },
-        })}
-        error={registerErrors.password?.message}
-      />
+  label="Пароль"
+  placeholder="Минимум 6 символов"
+  register={registerRegister("password", {
+    required: "Пароль обязателен",
+    minLength: {
+      value: 6,
+      message: "Пароль должен содержать минимум 6 символов",
+    },
+  })}
+  error={registerErrors.password?.message}
+/>
 
       <PasswordInput
         label="Подтвердите пароль"
