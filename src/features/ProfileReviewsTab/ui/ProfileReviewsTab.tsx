@@ -51,10 +51,10 @@ export const ProfileReviewsTab = () => {
                 </MenuItems>
               </Menu>
             </div>
-            <div className="from-lightorange to-darkorange flex items-center justify-center rounded-xl bg-gradient-to-r p-2 text-white">
+            <button className="from-lightorange to-darkorange flex center gap-1 rounded-xl bg-gradient-to-r transition-all hover:scale-103 cursor-pointer py-2 px-3 text-white">
               <Plus />
               <p>Написать</p>
-            </div>
+            </button>
           </div>
         </div>
       </div>
