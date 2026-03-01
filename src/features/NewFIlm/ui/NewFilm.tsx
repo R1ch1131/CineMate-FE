@@ -1,62 +1,58 @@
 import { Calendar } from "lucide-react";
 import React, { type FC } from "react";
 import { NewFilmItem } from "./NewFilmItem";
-import Film1 from "~/shared/assets/icons/filmImage.jpg";
-
-const mockFilms = [
-  {
-    image: Film1,
-    title: "Бегущий по лезвию 2099",
-    author: "Дени Вильнёв",
-    daysLeft: 23,
-    releaseDate: "15 ноября",
-    genre: "Sci-fi",
-    views: "12.4K",
-    rating: "Высокий",
-  },
-  {
-    image: Film1,
-    title: "Дюна: Часть вторая",
-    author: "Дени Вильнёв",
-    daysLeft: 23,
-    releaseDate: "15 ноября",
-    genre: "Sci-fi",
-    views: "12.4K",
-    rating: "Высокий",
-  },
-  {
-    image: Film1,
-    title: "Прибытие",
-    author: "Дени Вильнёв",
-    daysLeft: 23,
-    releaseDate: "15 ноября",
-    genre: "Sci-fi",
-    views: "12.4K",
-    rating: "Высокий",
-  },
-  {
-    image: Film1,
-    title: "Враг",
-    author: "Дени Вильнёв",
-    daysLeft: 23,
-    releaseDate: "15 ноября",
-    genre: "Sci-fi",
-    views: "12.4K",
-    rating: "Высокий",
-  },
-  {
-    image: Film1,
-    title: "Пленницы",
-    author: "Дени Вильнёв",
-    daysLeft: 23,
-    releaseDate: "15 ноября",
-    genre: "Sci-fi",
-    views: "12.4K",
-    rating: "Высокий",
-  },
-];
+import { useUpcomingMovies } from "../api/useUpcomingMovies";
 
 export const NewFilm: FC = () => {
+  const { data: movies, isLoading, error } = useUpcomingMovies();
+
+  const calculateDaysLeft = (releaseDate: string) => {
+    const today = new Date();
+    const release = new Date(releaseDate);
+    const diffTime = release.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : 0;
+  };
+
+  const formatReleaseDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ru-RU', { 
+      day: 'numeric', 
+      month: 'long' 
+    });
+  };
+
+  const formatVoteAverage = (vote: number) => {
+    if (vote >= 7) return 'Высокий';
+    if (vote >= 5) return 'Средний';
+    return 'Низкий';
+  };
+
+  const formatViews = (voteAverage: number) => {
+    const baseViews = Math.floor(voteAverage * 1000);
+    return `${baseViews}K`;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="bg-glass rounded-2xl p-6">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-glass rounded-2xl p-6">
+        <div className="text-red-500 text-center">
+          Ошибка загрузки: {error instanceof Error ? error.message : 'Unknown error'}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-glass rounded-2xl p-6">
       <div className="flex justify-between items-center pb-5">
@@ -74,17 +70,17 @@ export const NewFilm: FC = () => {
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        {mockFilms.map((film, index) => (
+        {movies?.map((movie) => (
           <NewFilmItem
-            key={index}
-            image={film.image}
-            title={film.title}
-            author={film.author}
-            daysLeft={film.daysLeft}
-            releaseDate={film.releaseDate}
-            genre={film.genre}
-            views={film.views}
-            rating={film.rating}
+            key={movie.id}
+            image={movie.posterUrl}
+            title={movie.title}
+            author={movie.genres.join(', ')}
+            daysLeft={calculateDaysLeft(movie.releaseDate)}
+            releaseDate={formatReleaseDate(movie.releaseDate)}
+            genre={movie.genres[0] || 'Не указан'}
+            views={formatViews(movie.voteAverage)}
+            rating={formatVoteAverage(movie.voteAverage)}
           />
         ))}
       </div>
