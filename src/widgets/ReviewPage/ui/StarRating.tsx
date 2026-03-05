@@ -7,13 +7,13 @@ export const StarRating = () => {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
 
-  const ratingDetails: { [key: number]: { text: string; className: string } } = {
-    1: { text: "Ужасно", className: "text-red-500 font-bold text-xl" },
-    2: { text: "Плохо", className: "text-orange-500 font-bold text-xl" },
-    3: { text: "Нормально", className: "text-yellow-500 font-bold text-xl" },
-    4: { text: "Хорошо", className: "text-lime-500 font-bold text-xl" },
-    5: { text: "Отлично", className: "text-green-500 font-bold text-xl" },
-  };
+  const ratingDetails: Record<number, { text: string; className: string }> = {
+  1: { text: "Ужасно", className: "text-red-500 font-bold text-xl" },
+  2: { text: "Плохо", className: "text-orange-500 font-bold text-xl" },
+  3: { text: "Нормально", className: "text-yellow-500 font-bold text-xl" },
+  4: { text: "Хорошо", className: "text-lime-500 font-bold text-xl" },
+  5: { text: "Отлично", className: "text-green-500 font-bold text-xl" },
+};
 
   const details = ratingDetails[rating];
   const displayRating = hoverRating || rating;

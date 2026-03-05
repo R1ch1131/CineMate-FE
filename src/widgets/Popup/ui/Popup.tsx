@@ -1,13 +1,28 @@
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import FilmImage  from "~/shared/assets/icons/filmImage.jpg";
+import FilmImage from "~/shared/assets/icons/filmImage.jpg";
 import { PopupTabs } from "~/features/PopupTabs";
 import { PopupHeader } from "~/features/PopupHeader";
+import { useQuery } from "@tanstack/react-query";
 
 interface PopupProps {
   isOpen: boolean;
   onClose: () => void;
+  movieId: number; 
 }
+
+import type {MovieDetails} from "~/shared/types/movie"
+
+const fetchMovieDetails = async (movieId: number): Promise<MovieDetails> => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/movies/${movieId}`);
+
+  if (!res.ok) {
+    throw new Error("Ошибка при загрузке данных фильма");
+  }
+
+  const data = (await res.json()) as unknown as MovieDetails;
+  return data;
+};
 
 const useBodyScrollLock = (isLocked: boolean) => {
   useEffect(() => {
@@ -25,9 +40,14 @@ const useBodyScrollLock = (isLocked: boolean) => {
   }, [isLocked]);
 };
 
-export const Popup: React.FC<PopupProps> = ({ isOpen, onClose }) => {
+export const Popup: React.FC<PopupProps> = ({ isOpen, onClose, movieId }) => {
   const popupRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState(0);
+  const { data: movie, isLoading, error } = useQuery({
+    queryKey: ["movie", movieId],
+    queryFn: () => fetchMovieDetails(movieId),
+    enabled: isOpen && !!movieId, 
+  });
 
   useBodyScrollLock(isOpen);
 
@@ -71,28 +91,48 @@ export const Popup: React.FC<PopupProps> = ({ isOpen, onClose }) => {
         className="flex h-11/12 w-1/2 flex-col overflow-hidden rounded-2xl border border-gray-600 bg-[#0f172a] shadow-lg"
         onClick={handlePopupClick}
       >
-        <div className="relative h-5/12 w-full">
-          <Image
-            src={FilmImage}
-            alt="Background"
-            fill
-            className="rounded-t-2xl object-cover"
-            style={{ objectPosition: "center center" }}
-          />
-          <div className="absolute right-0 bottom-0 left-0 h-3/4 bg-gradient-to-t from-[#0f172a] to-transparent" />
-          <div className="absolute top-4 right-4">
-            <button
-              onClick={handleButtonClick}
-              className="2k:h-12 2k:w-12 flex h-8 w-8 items-center justify-center rounded-full bg-gray-800 text-xl text-white transition-colors hover:bg-gray-700"
-            >
-              ×
-            </button>
+        {isLoading ? (
+          <div className="flex h-full items-center justify-center text-white">
+            Загрузка...
           </div>
-         <PopupHeader onTabChange={setActiveTab} />
-        </div>
-        <div className="invisible-scroll flex-1 overflow-y-auto p-6">
-          <PopupTabs selectedIndex={activeTab} onTabChange={setActiveTab} />
-        </div>
+        ) : error ? (
+          <div className="flex h-full items-center justify-center text-red-500">
+            Ошибка загрузки данных
+          </div>
+        ) : movie ? (
+          <>
+            <div className="relative h-5/12 w-full">
+              <Image
+                src={movie.backdropUrl ?? FilmImage}
+                alt={movie.title}
+                fill
+                className="rounded-t-2xl object-cover"
+                style={{ objectPosition: "center center" }}
+                unoptimized
+              />
+              <div className="absolute right-0 bottom-0 left-0 h-3/4 bg-gradient-to-t from-[#0f172a] to-transparent" />
+              <div className="absolute top-4 right-4">
+                <button
+                  onClick={handleButtonClick}
+                  className="2k:h-12 2k:w-12 flex h-8 w-8 items-center justify-center rounded-full bg-gray-800 text-xl text-white transition-colors hover:bg-gray-700"
+                >
+                  ×
+                </button>
+              </div>
+              <PopupHeader  
+                onTabChange={setActiveTab} 
+                movie={movie} 
+              />
+            </div>
+            <div className="invisible-scroll flex-1 overflow-y-auto px-6">
+              <PopupTabs 
+                movie={movie}
+                selectedIndex={activeTab} 
+                onTabChange={setActiveTab} 
+              />
+            </div>
+          </>
+        ) : null}
       </div>
     </div>
   );

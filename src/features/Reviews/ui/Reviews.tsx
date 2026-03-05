@@ -5,23 +5,18 @@ import { Property } from "~/entities/Property";
 import {
   Bookmark,
   Calendar,
-  Dot,
   Flag,
   Flame,
   Heart,
-  LucideThumbsUp,
   MessageCircle,
   MoreHorizontal,
-  Send,
   Share2,
   Star,
-  Undo2,
 } from "lucide-react";
 import { FilmGenre } from "~/shared/ui/FilmGenre";
-import { Description, Field, Label, Textarea } from "@headlessui/react";
-import clsx from "clsx";
-
 import { CommentSection } from "./CommentSection";
+
+
 
 interface ReviewsProps {
   review: {

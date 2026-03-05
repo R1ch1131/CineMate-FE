@@ -13,7 +13,7 @@ export const authConfig: AuthOptions = {
         if (!credentials?.email || !credentials?.password) return null;
 
         const res = await fetch(
-          `http://72.56.106.83:8080/api/auth/sign-in`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/sign-in`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -82,7 +82,7 @@ export const authConfig: AuthOptions = {
 
 async function refreshAccessToken(token: any) {
   try {
-    const res = await fetch(`http://72.56.106.83:8080/api/auth/refresh`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken: token.refreshToken }),

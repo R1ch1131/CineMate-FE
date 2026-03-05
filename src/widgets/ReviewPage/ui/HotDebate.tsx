@@ -61,7 +61,7 @@ export const HotDebate = () => {
               </div>
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-3">
-                  <p className="text-2xl font-bold">Спор о "Дюна: Часть вторая"</p>
+                  <p className="text-2xl font-bold">Спор о Дюна: Часть вторая</p>
                   <div className="center flex rounded-lg bg-blue-500/30 px-2 py-0.5 text-blue-300">
                     <p>О фильме</p>
                   </div>

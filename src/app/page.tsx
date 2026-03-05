@@ -11,7 +11,7 @@ import { SideBar } from "~/features/SideBar";
 
 type Movie = {
   id: number;
-  tmdbId?:number;
+  tmdbId:number;
   title: string;
   overview: string;
   voteAverage?: number;
@@ -21,11 +21,14 @@ type Movie = {
 };
 
 const fetchNewReleases = async (): Promise<Movie[]> => {
-  const res = await fetch("http://72.56.106.83:8080/api/movies/new-releases");
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/movies/new-releases`);
+
   if (!res.ok) {
     throw new Error("Ошибка при загрузке фильмов");
   }
-  return res.json();
+
+  const data = (await res.json()) as Movie[];
+  return data;
 };
 
 export default function HomePage() {
@@ -68,7 +71,6 @@ export default function HomePage() {
 
         <div className="flex w-full max-w-7xl gap-8">
           <div className="flex flex-1 flex-col gap-5">
-            {/* Новинки кино */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Flame className="h-8 w-8 text-red-500" />
@@ -92,7 +94,6 @@ export default function HomePage() {
               </Link>
             </div>
 
-            {/* Grid фильмов */}
             <div className="grid grid-cols-4 gap-6">
               {isLoading && (
                 <p className="text-white col-span-4 text-center">Загрузка...</p>
@@ -107,7 +108,6 @@ export default function HomePage() {
               ))}
             </div>
 
-            {/* Свежие рецензии */}
             <div className="mt-8 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <BookOpen className="h-8 w-8 text-green-500" />
@@ -132,7 +132,7 @@ export default function HomePage() {
             </div>
 
             <div className="flex flex-col gap-5 py-5">
-              {/* тут потом будут рецензии */}
+             
             </div>
           </div>
 
