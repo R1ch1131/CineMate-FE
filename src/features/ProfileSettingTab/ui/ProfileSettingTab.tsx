@@ -50,7 +50,7 @@ export const ProfileSettingTab = () => {
                 width={100}
                 height={100}
                 className="h-25 w-25 rounded-2xl object-cover"
-                src={preview || session?.data?.user?.image || noAvatar}
+                src={preview ?? session?.data?.user?.image ?? noAvatar}
                 alt="ava"
               />
             </div>

@@ -16,7 +16,7 @@ export default function HomePage() {
     <main>
       <div>
         <Link className="absolute top-6 left-32" href="/">
-          <Image src={logoImage} alt="Cinemate Logo" width={250} />
+          <Image src={logoImage as string} alt="Cinemate Logo" width={250} />
         </Link>
         <div className="flex min-h-screen items-center justify-center">
           <div className="relative flex flex-col items-center justify-center gap-[clamp(1rem,3vw,2rem)]">

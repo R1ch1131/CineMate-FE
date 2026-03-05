@@ -73,12 +73,12 @@ export const NewFilm: FC = () => {
         {movies?.map((movie) => (
           <NewFilmItem
             key={movie.id}
-            image={movie.posterUrl}
+            posterUrl={movie.posterUrl}
             title={movie.title}
-            author={movie.genres.join(', ')}
+            author={movie.genres.slice(0, 2).join(', ')}  
             daysLeft={calculateDaysLeft(movie.releaseDate)}
             releaseDate={formatReleaseDate(movie.releaseDate)}
-            genre={movie.genres[0] || 'Не указан'}
+            genre={movie.genres[0] ?? 'Не указан'}
             views={formatViews(movie.voteAverage)}
             rating={formatVoteAverage(movie.voteAverage)}
           />

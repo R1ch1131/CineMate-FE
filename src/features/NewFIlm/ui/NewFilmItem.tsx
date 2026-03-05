@@ -3,7 +3,7 @@ import Image from "next/image";
 import React, { type FC } from "react";
 
 interface NewFilmItemProps {
-  image: string;
+  posterUrl: string;
   title: string;
   author: string;
   daysLeft: number;
@@ -14,7 +14,7 @@ interface NewFilmItemProps {
 }
 
 export const NewFilmItem: FC<NewFilmItemProps> = ({
-  image,
+  posterUrl,
   title,
   author,
   daysLeft,
@@ -26,7 +26,7 @@ export const NewFilmItem: FC<NewFilmItemProps> = ({
         <div className="relative">
           <Image
             className="h-30 w-20 rounded-lg object-cover"
-            src={image}
+            src={posterUrl}
             alt={title}
             width={70}
             height={10}
@@ -40,7 +40,9 @@ export const NewFilmItem: FC<NewFilmItemProps> = ({
           </div>
         </div>
         <div className="flex flex-col gap-2 flex-1">
-          <span className="text-lg font-bold pl-1 line-clamp-1">{title}</span>
+          <span className="text-lg font-bold pl-1 line-clamp-1">
+  {title.length > 20 ? title.slice(0, 20) + "..." : title}
+</span>
           <span className="flex items-center text-base gap-1.5 text-green-400">
             <p></p>
             {releaseDate}

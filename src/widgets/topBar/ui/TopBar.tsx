@@ -30,7 +30,7 @@ export const TopBar = () => {
     <div className="mb-5 flex h-22 w-full items-center justify-between px-32 py-4 text-white">
       <div className="flex-1">
         <Link href="/">
-          <Image src={logoImage} alt="Cinemate Logo" width={250} />
+          <Image src={logoImage as string} alt="Cinemate Logo" width={250} />
         </Link>
       </div>
 

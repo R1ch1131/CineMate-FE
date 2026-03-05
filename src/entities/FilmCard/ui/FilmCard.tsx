@@ -3,19 +3,18 @@
 import React, { useState } from "react";
 import { Popup } from "~/widgets/Popup";
 import Image from "next/image";
-import { Dot, MessageCircle, Star } from "lucide-react";
 import { FilmGenre } from "~/shared/ui/FilmGenre";
 import { Property } from "~/entities/Property";
 
 type Movie = {
   id: number;
-  tmdbId?:number;
+  tmdbId: number;
   title: string;
   overview: string;
   voteAverage?: number;
   releaseDate: string;
   posterUrl: string;
-  genres: string;
+  genres: string | string[] | undefined;
 };
 
 interface FilmCardProps {
@@ -44,7 +43,7 @@ export const FilmCard = ({ movie }: FilmCardProps) => {
             alt={movie.title}
             fill
             className="object-cover rounded-2xl"
-            unoptimized 
+            unoptimized
           />
 
           <div className="absolute top-1/2 h-1/2 w-full rounded-b-2xl bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -56,7 +55,6 @@ export const FilmCard = ({ movie }: FilmCardProps) => {
                 color={"bg-green-500/80 border-green-500 !py-0 !px-0.5 !rounded-sm"}
                 textColor="!text-sm"
               />
-              
             </div>
           </div>
         </div>
@@ -65,12 +63,20 @@ export const FilmCard = ({ movie }: FilmCardProps) => {
           <p>{movie.title}</p>
           <div className="flex justify-between">
             <span>{movie.releaseDate.split('-')[0]}</span>
-            <FilmGenre genre={Array.isArray(movie.genres) ? movie.genres[0] : movie.genres} />
+            <FilmGenre
+              genre={Array.isArray(movie.genres) ? movie.genres[0] ?? "Неизвестно" : movie.genres ?? "Неизвестно"}
+            />
           </div>
         </div>
       </div>
 
-      {isPopupOpen && <Popup isOpen={isPopupOpen} onClose={closePopup} />}
+      {isPopupOpen && (
+        <Popup
+          isOpen={isPopupOpen}
+          onClose={closePopup}
+          movieId={movie.tmdbId || movie.id} // передаем ID фильма
+        />
+      )}
     </>
   );
 };

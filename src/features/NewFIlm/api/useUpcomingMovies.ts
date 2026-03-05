@@ -12,19 +12,22 @@ interface Movie {
 }
 
 const fetchUpcomingMovies = async (): Promise<Movie[]> => {
-  const response = await fetch('http://72.56.106.83:8080/api/movies/upcoming');
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/movies/upcoming`);
+
   if (!response.ok) {
     throw new Error('Failed to fetch movies');
   }
-  const data = await response.json();
+
+  const data = (await response.json()) as unknown as Movie[];
+
   return data.slice(0, 4);
 };
 
 export const useUpcomingMovies = () => {
-  return useQuery({
+  return useQuery<Movie[]>({
     queryKey: ['upcomingMovies'],
     queryFn: fetchUpcomingMovies,
-    staleTime: 5 * 60 * 1000, // 5 минут
-    gcTime: 10 * 60 * 1000, // 10 минут
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 };
