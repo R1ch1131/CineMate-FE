@@ -1,5 +1,4 @@
 import { Activity } from "lucide-react";
-import React from "react";
 import { ActivityItem } from "~/entities/ActivityItem";
 import Actor from "~/shared/assets/icons/actor.jpg";
 

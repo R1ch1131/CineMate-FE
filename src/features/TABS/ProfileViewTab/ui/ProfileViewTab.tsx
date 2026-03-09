@@ -1,5 +1,4 @@
 import { Activity, Award, BookOpen, Crown, Film, Heart, Star } from "lucide-react";
-import React from "react";
 import { AchivmentsItem } from "~/shared/ui/AchivmentsItem";
 
 export const ProfileViewTab = () => {

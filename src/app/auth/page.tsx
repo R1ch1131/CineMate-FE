@@ -26,7 +26,7 @@ export default function HomePage() {
               <p className="text-orange text-xl">{CONSTANTS.auth.label.open}</p>
               <Sparkles className="text-orange"/>
             </div>
-            <div className="bg-glass relative flex w-[400px] justify-center rounded-3xl border-1 border-gray-600 shadow-2xl">
+            <div className="bg-glass relative flex w-100 justify-center rounded-3xl border border-gray-600 shadow-2xl">
               <div className="my-10 w-full">
                 <AuthTabs />
               </div>
