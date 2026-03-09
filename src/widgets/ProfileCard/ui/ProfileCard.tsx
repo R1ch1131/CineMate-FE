@@ -6,11 +6,11 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import React, { useState } from "react";
 import { ProfileStats } from "~/entities/ProfileStats";
-import { ProfileDebateTab } from "~/features/ProfileDebateTab";
-import { ProfileLikeTab } from "~/features/ProfileLikeTab";
-import { ProfileReviewsTab } from "~/features/ProfileReviewsTab";
-import { ProfileSettingTab } from "~/features/ProfileSettingTab";
-import { ProfileViewTab } from "~/features/ProfileViewTab";
+import { ProfileDebateTab } from "~/features/TABS/ProfileDebateTab";
+import { ProfileLikeTab } from "~/features/TABS/ProfileLikeTab";
+import { ProfileReviewsTab } from "~/features/TABS/ProfileReviewsTab";
+import { ProfileSettingTab } from "~/features/TABS/ProfileSettingTab";
+import { ProfileViewTab } from "~/features/TABS/ProfileViewTab";
 import noAvatar from "~/shared/assets/icons/noAvatar.jpg";
 
 interface ProfileCardProps {

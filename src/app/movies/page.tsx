@@ -2,8 +2,8 @@
 
 import { Search } from "lucide-react";
 import { CategoryBlock } from "~/features/SearchBar";
-import { FilmCardBlock } from "~/features/FilmCardBlock";
 import { useState } from "react";
+import FilmCardBlock from "~/features/FilmCardBlock/ui/FilmCardBlock";
 
 export default function HomePage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -22,7 +22,7 @@ export default function HomePage() {
           </div>
           <h1 className="flex flex-col items-center text-5xl leading-tight font-bold text-white md:text-7xl">
             Найдите свой
-            <span className="block bg-gradient-to-r from-amber-400 via-orange-500 to-red-600 bg-clip-text text-transparent">
+            <span className="block bg-linear-to-r from-amber-400 via-orange-500 to-red-600 bg-clip-text text-transparent">
               идеальный фильм
             </span>
           </h1>
@@ -39,7 +39,10 @@ export default function HomePage() {
         </div>
       </section>
       <section>
-        <FilmCardBlock viewMode={viewMode} />
+        <FilmCardBlock category={"new-releases"} />
+        <FilmCardBlock category={"top-rated"} />
+        <FilmCardBlock category={"trending"} />
+        <FilmCardBlock category={"upcoming"} />
       </section>
     </main>
   );

@@ -2,7 +2,7 @@ import React from "react";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { ViewTab } from "~/features/viewTab";
 import { ActorTab } from "~/features/ActorTab";
-import { ReviewTab } from "~/features/ReviewsTab/ui/Reviwew";
+import { ReviewTab } from "~/features/TABS/ReviewsTab/ui/Reviwew";
 import { MediaTab } from "~/features/MediaTab";
 
 import type { MovieDetails} from "~/shared/types/movie"

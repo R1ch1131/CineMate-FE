@@ -9,9 +9,9 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'; // опци
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000,      // данные считаются свежими 5 минут
-      gcTime: 10 * 60 * 1000,        // время хранения в кэше после использования
-      refetchOnWindowFocus: false,   // не перезапрашивать при фокусе окна
+      staleTime: 5 * 60 * 1000,   
+      gcTime: 10 * 60 * 1000,        
+      refetchOnWindowFocus: false,   
     },
   },
 });

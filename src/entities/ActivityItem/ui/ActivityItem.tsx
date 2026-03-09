@@ -1,6 +1,5 @@
 'use client'
 
-import React from "react";
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 
@@ -23,7 +22,7 @@ export const ActivityItem = ({name, action, film, image}: ActivityItemProps) => 
                 alt={"avatar"} 
             />
             <div className="flex-1 min-w-0">
-                <Link className="font-medium group-hover:text-amber-400 transition-colors" href={"/profile"}>
+                <Link className="font-medium group-hover:text-amber-400 transition-colors" href={"/publicProfile"}>
                     {name}
                 </Link>
                 <span className="text-gray-400 mx-1">{action}</span>
