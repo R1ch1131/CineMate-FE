@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { FilmCard } from "~/entities/FilmCard/ui/FilmCard";
+import type { Category } from "~/shared/types/category";
 
 type Movie = {
   id: number;
-  tmdbId:number;
+  tmdbId: number;
   title: string;
   overview: string;
   voteAverage?: number;
@@ -12,55 +13,44 @@ type Movie = {
   genres: string;
 };
 
-type Category = 'new-releases' | 'top-rated' | 'trending' | 'upcoming';
+const fetchMovies = async (category: Category): Promise<Movie[]> => {
+  const url =
+    category === "all"
+      ? `${process.env.NEXT_PUBLIC_API_URL}/api/movies`
+      : `${process.env.NEXT_PUBLIC_API_URL}/api/movies/${category}`;
 
-const fetchMoviesByCategory = async (category: Category): Promise<Movie[]> => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/movies/${category}`);
+  const res = await fetch(url);
 
   if (!res.ok) {
-    throw new Error(`Ошибка при загрузке фильмов категории: ${category}`);
+    throw new Error("Ошибка загрузки фильмов");
   }
 
-  const data = (await res.json()) as Movie[];
-  return data;
+  return (await res.json()) as Movie[];
 };
 
-type FilmCardBlockProps = {
-  category: Category;
-  title?: string;
-};
-
-export default function FilmCardBlock({ category, title }: FilmCardBlockProps) {
-  const { data: movies, isLoading, error } = useQuery({
+export default function FilmCardBlock({ category }: { category: Category }) {
+  const { data, isLoading, error } = useQuery<Movie[]>({
     queryKey: ["movies", category],
-    queryFn: () => fetchMoviesByCategory(category),
+    queryFn: () => fetchMovies(category),
   });
 
-  const categoryTitles = {
-    'new-releases': 'Новинки',
-    'top-rated': 'Высокий рейтинг',
-    'trending': 'Популярное',
-    'upcoming': 'Скоро в кино'
-  };
+  if (isLoading) {
+    return (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+        </div>
+    );
+  }
+
+  if (error) {
+    return <p className="text-center text-red-500">Ошибка загрузки</p>;
+  }
 
   return (
-    <div className="mx-auto mt-8 flex max-w-7xl flex-col gap-4">
-      {title && <h2 className="text-2xl font-bold text-white">{title}</h2>}
-      <div>
-        <div className="grid grid-cols-5 gap-8">
-          {isLoading && (
-            <p className="text-white col-span-5 text-center">Загрузка...</p>
-          )}
-          
-          {error && (
-            <p className="text-red-500 col-span-5 text-center">{error.message}</p>
-          )}
-          
-          {!isLoading && !error && movies?.map((movie) => (
-            <FilmCard key={movie.id} movie={movie} />
-          ))}
-        </div>
-      </div>
+    <div className="mx-auto mt-8 grid max-w-7xl grid-cols-5 gap-8">
+      {data?.map((movie) => (
+        <FilmCard key={movie.id} movie={movie} />
+      ))}
     </div>
   );
-};
+}

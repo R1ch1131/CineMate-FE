@@ -30,6 +30,7 @@ interface RegisterResponse {
 export const RegisterForm = () => {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const {
     register: registerRegister,
@@ -41,6 +42,7 @@ export const RegisterForm = () => {
   const password = watch("password");
 
   const onRegisterSubmit = async (data: RegisterFormData) => {
+    setIsLoading(true); 
     setErrorMessage(null);
 
     try {
@@ -58,7 +60,6 @@ export const RegisterForm = () => {
       try {
         result = await res.json() as RegisterResponse;
       } catch {
-        // Если ответ не в JSON формате, создаем объект с текстом
         const text = await res.text();
         result = { message: text };
       }
@@ -84,6 +85,8 @@ export const RegisterForm = () => {
       } else {
         setErrorMessage("Неизвестная ошибка при регистрации");
       }
+    } finally {
+      setIsLoading(false); 
     }
   };
 
@@ -111,6 +114,7 @@ export const RegisterForm = () => {
           },
         })}
         error={registerErrors.name?.message}
+        disabled={isLoading} 
       />
 
       <EmailInput
@@ -122,20 +126,22 @@ export const RegisterForm = () => {
           },
         })}
         error={registerErrors.email?.message}
+        disabled={isLoading}
       />
 
       <PasswordInput
-  label="Пароль"
-  placeholder="Минимум 6 символов"
-  register={registerRegister("password", {
-    required: "Пароль обязателен",
-    minLength: {
-      value: 6,
-      message: "Пароль должен содержать минимум 6 символов",
-    },
-  })}
-  error={registerErrors.password?.message}
-/>
+        label="Пароль"
+        placeholder="Минимум 6 символов"
+        register={registerRegister("password", {
+          required: "Пароль обязателен",
+          minLength: {
+            value: 6,
+            message: "Пароль должен содержать минимум 6 символов",
+          },
+        })}
+        error={registerErrors.password?.message}
+        disabled={isLoading} 
+      />
 
       <PasswordInput
         label="Подтвердите пароль"
@@ -145,10 +151,16 @@ export const RegisterForm = () => {
           validate: (value) => value === password || "Пароли не совпадают",
         })}
         error={registerErrors.confirmPassword?.message}
+        disabled={isLoading} 
       />
 
       <div className="pt-3">
-        <RegistrButton text="Создать аккаунт" />
+        <RegistrButton 
+          textButton="Регистрация..."
+          text={isLoading ? "Создание аккаунта..." : "Создать аккаунт"} 
+          isLoading={isLoading} 
+          disabled={isLoading} 
+        />
       </div>
     </form>
   );
