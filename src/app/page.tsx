@@ -11,7 +11,7 @@ import { SideBar } from "~/features/SideBar";
 
 type Movie = {
   id: number;
-  tmdbId:number;
+  tmdbId: number;
   title: string;
   overview: string;
   voteAverage?: number;
@@ -96,7 +96,9 @@ export default function HomePage() {
 
             <div className="grid grid-cols-4 gap-6">
               {isLoading && (
-                <p className="text-white col-span-4 text-center">Загрузка...</p>
+                <div className="col-span-4 flex justify-center items-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+                </div>
               )}
 
               {error && (
@@ -132,7 +134,6 @@ export default function HomePage() {
             </div>
 
             <div className="flex flex-col gap-5 py-5">
-             
             </div>
           </div>
 

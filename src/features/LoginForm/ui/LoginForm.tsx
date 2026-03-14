@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,7 @@ interface LoginFormData {
 export const LoginForm = () => {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const {
     register,
@@ -25,18 +26,25 @@ export const LoginForm = () => {
   } = useForm<LoginFormData>();
 
   const onLoginSubmit = async (data: LoginFormData) => {
+    setIsLoading(true);
     setErrorMessage(null);
 
-    const res = await signIn("credentials", {
-      redirect: false,
-      email: data.email,
-      password: data.password,
-    });
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+      });
 
-    if (res?.error) {
-      setErrorMessage("Неверный email или пароль");
-    } else {
-      router.push("/");
+      if (res?.error) {
+        setErrorMessage("Неверный email или пароль");
+      } else {
+        router.push("/");
+      }
+    } catch (error) {
+      setErrorMessage("Произошла ошибка при входе");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -62,6 +70,7 @@ export const LoginForm = () => {
           },
         })}
         error={errors.email?.message}
+        disabled={isLoading}
       />
 
       <PasswordInput
@@ -75,10 +84,16 @@ export const LoginForm = () => {
           },
         })}
         error={errors.password?.message}
+        disabled={isLoading}
       />
 
       <div className="pt-3">
-        <RegistrButton text="Войти в аккаунт" />
+        <RegistrButton 
+          textButton="Вход..."
+          text="Войти в аккаунт"
+          isLoading={isLoading}
+          disabled={isLoading}
+        />
       </div>
     </form>
   );
