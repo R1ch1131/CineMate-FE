@@ -114,7 +114,7 @@ export default function HomePage() {
               <div className="flex items-center gap-3">
                 <BookOpen className="h-8 w-8 text-green-500" />
                 <p className="text-3xl font-bold text-white">
-                  Свежие рецензии
+                  Свежие Рецензии
                 </p>
                 <Property
                   text={"Обновлено"}
