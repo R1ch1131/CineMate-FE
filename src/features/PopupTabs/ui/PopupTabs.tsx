@@ -1,4 +1,3 @@
-import React from "react";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { ViewTab } from "~/features/viewTab";
 import { ActorTab } from "~/features/ActorTab";

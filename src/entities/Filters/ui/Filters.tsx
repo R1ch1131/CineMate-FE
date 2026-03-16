@@ -3,7 +3,6 @@ import { useState } from "react";
 import { CustomDropdown } from "~/entities/CustomDropdown";
 import {
   sortOptions,
-  categoryOptions,
   genreOptions,
   yearOptions,
 } from "./model/data";
@@ -21,21 +20,16 @@ export const Filters: React.FC = () => {
     label: "Все годы",
     value: "all",
   });
-  const [selectedCategory, setSelectedCategory] = useState({
-    label: "Все фильмы",
-    value: "all",
-  });
 
   const clearFilters = () => {
     setSelectedSort({ label: "По популярности", value: "popularity" });
     setSelectedGenre({ label: "Все жанры", value: "all" });
     setSelectedYear({ label: "Все годы", value: "all" });
-    setSelectedCategory({ label: "Все фильмы", value: "all" });
   };
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <CustomDropdown
           label="Сортировка"
           options={sortOptions}
@@ -53,12 +47,6 @@ export const Filters: React.FC = () => {
           options={yearOptions}
           selected={selectedYear}
           setSelected={setSelectedYear}
-        />
-        <CustomDropdown
-          label="Категория"
-          options={categoryOptions}
-          selected={selectedCategory}
-          setSelected={setSelectedCategory}
         />
       </div>
       <div className="mt-6 flex w-full items-center justify-between">
