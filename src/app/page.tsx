@@ -106,7 +106,7 @@ export default function HomePage() {
               )}
 
               {!isLoading && !error && movies?.slice(0, 4).map((movie) => (
-                <FilmCard key={movie.id} movie={movie} />
+                <FilmCard key={movie.id} movie={movie} variant={"grid"} />
               ))}
             </div>
 

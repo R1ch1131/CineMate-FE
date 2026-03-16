@@ -110,7 +110,7 @@ export const Popup: React.FC<PopupProps> = ({ isOpen, onClose, movieId }) => {
                 style={{ objectPosition: "center center" }}
                 unoptimized
               />
-              <div className="absolute right-0 bottom-0 left-0 h-3/4 bg-gradient-to-t from-[#0f172a] to-transparent" />
+              <div className="absolute right-0 bottom-0 left-0 h-3/4 bg-linear-to-t from-[#0f172a] to-transparent" />
               <div className="absolute top-4 right-4">
                 <button
                   onClick={handleButtonClick}
