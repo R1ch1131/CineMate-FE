@@ -6,17 +6,13 @@ import { useState, useCallback, useEffect } from "react";
 import FilmCardBlock from "~/features/FilmCardBlock/ui/FilmCardBlock";
 import type { Category } from "~/shared/types/category";
 
+// ✅ debounce hook
 function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
+    const handler = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(handler);
   }, [value, delay]);
 
   return debouncedValue;
@@ -26,15 +22,60 @@ export default function HomePage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [category, setCategory] = useState<Category>("all");
   const [searchInput, setSearchInput] = useState<string>("");
-  
+
+  const [page, setPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+
   const debouncedSearch = useDebounce(searchInput, 500);
 
-  const handleSearchChange = useCallback((value: string) => {
-    setSearchInput(value);
-  }, []);
+  const handleSearchChange = useCallback((value: string) => setSearchInput(value), []);
+  const toggleViewMode = () => setViewMode(prev => prev === "grid" ? "list" : "grid");
 
-  const toggleViewMode = () => {
-    setViewMode((prev) => (prev === "grid" ? "list" : "grid"));
+  function scrollToTop(duration = 500) {
+  const start = window.scrollY;
+  const startTime = performance.now();
+
+  function animate(time: number) {
+    const elapsed = time - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+
+    window.scrollTo(0, start * (1 - ease));
+
+    if (progress < 1) requestAnimationFrame(animate);
+  }
+
+  requestAnimationFrame(animate);
+}
+
+  // 👉 reset page on category/search change
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, category]);
+
+useEffect(() => {
+  scrollToTop(600); // 600ms плавного скролла
+}, [page]);
+
+  // 👉 generate pagination with "..."
+  const getPagination = () => {
+    const pages: (number | string)[] = [];
+    const maxVisible = 5;
+
+    if (totalPages <= maxVisible) return Array.from({ length: totalPages }, (_, i) => i + 1);
+
+    pages.push(1);
+    if (page > 3) pages.push("...");
+
+    const start = Math.max(2, page - 1);
+    const end = Math.min(totalPages - 1, page + 1);
+
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (page < totalPages - 2) pages.push("...");
+
+    pages.push(totalPages);
+
+    return pages;
   };
 
   return (
@@ -67,11 +108,36 @@ export default function HomePage() {
       </section>
 
       <section>
-        <FilmCardBlock 
-          category={category} 
+        <FilmCardBlock
+          category={category}
           viewMode={viewMode}
           searchQuery={debouncedSearch}
+          page={page}
+          onTotalPagesChange={setTotalPages}
         />
+      </section>
+
+      {/* 👉 ПАГИНАЦИЯ */}
+      <section className="flex justify-center items-center gap-2 py-10 flex-wrap">
+       
+
+        {getPagination().map((p, index) =>
+          typeof p === "string" ? (
+            <span key={`dots-${index}`} className="px-2 text-white">...</span>
+          ) : (
+            <button
+              key={`page-${p}`}
+              onClick={() => setPage(p)}
+              className={`px-4 py-2 rounded border ${
+                p === page ? "bg-gradient text-white font-bold border border-black" : "text-white border-white"
+              }`}
+            >
+              {p}
+            </button>
+          )
+        )}
+
+       
       </section>
     </main>
   );
