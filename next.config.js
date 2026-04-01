@@ -1,5 +1,3 @@
-import "./src/env.js";
-
 /** @type {import("next").NextConfig} */
 const config = {
   images: {
@@ -11,6 +9,14 @@ const config = {
         pathname: "/**",
       },
     ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/api/profile/:path*',
+        destination: 'http://72.56.106.83:8080/api/profile/:path*',
+      },
+    ];
   },
 };
 

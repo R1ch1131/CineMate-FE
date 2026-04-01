@@ -1,39 +1,126 @@
 'use client'
 
 import { Description, Field, Input, Textarea } from "@headlessui/react";
-import { Edit3, LogOut, Shield } from "lucide-react";
+import { Edit3, LogOut, Shield, Loader2, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import noAvatar from "~/shared/assets/icons/noAvatar.jpg";
-import { signOut } from 'next-auth/react';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 
-export const ProfileSettingTab = () => {
-  const session = useSession();
+interface ProfileSettingTabProps {
+  onUpdate?: () => void;
+}
 
+// Интерфейс для локального состояния формы
+interface FormState {
+  username: string;
+  email: string;
+  bio: string;
+  createdAt: string; // Добавлено для сохранения даты в цепочке обновлений
+}
+
+export const ProfileSettingTab = ({ onUpdate }: ProfileSettingTabProps) => {
+  const { data: session, update } = useSession();
+  
+  // Безопасное получение токена и пользователя
+  const user = session?.user;
+  const token = (user as { accessToken?: string })?.accessToken;
+
+  const [formData, setFormData] = useState<FormState>({ 
+    username: "", 
+    email: "", 
+    bio: "", 
+    createdAt: "" 
+  });
+  
+  const [initialData, setInitialData] = useState<FormState>({ 
+    username: "", 
+    email: "", 
+    bio: "", 
+    createdAt: "" 
+  });
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const imageUrl = URL.createObjectURL(file);
-    setPreview(imageUrl);
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+  // Синхронизация данных из сессии в форму
+  useEffect(() => {
+    if (user) {
+      const data: FormState = {
+        username: user.name ?? "",
+        email: user.email ?? "",
+        bio: (user as { bio?: string }).bio ?? "",
+        createdAt: (user as { createdAt?: string }).createdAt ?? ""
+      };
+      
+      setFormData(data);
+      setInitialData(data);
     }
+  }, [session, user]);
 
-  };
+  const handleSave = async () => {
+    if (!token || isSaving) return;
+    setIsSaving(true);
+    setIsSuccess(false);
 
-  const handleDeleteAvatar = () => {
-    setPreview(null);
+    try {
+      // 1. Обновление Username
+      if (formData.username !== initialData.username) {
+        await fetch('/api/profile/username', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ username: formData.username })
+        });
+      }
 
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      // 2. Обновление Email
+      if (formData.email !== initialData.email) {
+        await fetch('/api/profile/email', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ newEmail: formData.email })
+        });
+      }
+
+      // 3. Обновление Bio
+      if (formData.bio !== initialData.bio) {
+        await fetch('/api/profile/bio', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ bio: formData.bio })
+        });
+      }
+
+      /**
+       * КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ:
+       * Мы передаем createdAt обратно в update, чтобы колбэк jwt в auth.ts 
+       * не получил undefined и не затер дату в токене.
+       */
+      await update({
+        user: {
+          ...user,
+          name: formData.username,
+          email: formData.email,
+          bio: formData.bio,
+          createdAt: formData.createdAt // Передаем дату регистрации дальше
+        }
+      });
+
+      if (onUpdate) {
+        setTimeout(() => onUpdate(), 300);
+      }
+
+      setIsSuccess(true);
+      setInitialData({ ...formData });
+      setTimeout(() => setIsSuccess(false), 3000);
+
+    } catch (error) {
+      console.error("Ошибка сохранения:", error);
+    } finally {
+      setIsSaving(false);
     }
-
   };
 
   return (
@@ -42,139 +129,114 @@ export const ProfileSettingTab = () => {
         <div className="bg-glass rounded-2xl border border-frostedglass p-8">
           <div className="flex gap-3 items-center pb-4">
             <Edit3 className="text-lightorange" />
-            <p className="text-white text-2xl">Редактирование профиля</p>
+            <p className="text-white text-2xl font-bold">Редактирование</p>
           </div>
+          
           <div className="flex items-center gap-4">
-            <div>
-              <Image
-                width={100}
-                height={100}
-                className="h-25 w-25 rounded-2xl object-cover"
-                src={preview ?? session?.data?.user?.image ?? noAvatar}
-                alt="ava"
-              />
-            </div>
-
+            <Image 
+              width={100} height={100} 
+              className="h-25 w-25 rounded-2xl object-cover" 
+              src={preview ?? user?.image ?? noAvatar} 
+              alt="avatar" 
+            />
             <div className="flex flex-col gap-1">
               <p className="text-white text-lg font-bold">Фото профиля</p>
-              <p className="text-grey pb-1">
-                Загрузите изображение размером не менее 400x400 пикселей
-              </p>
-
-              <div className="flex gap-3">
-                <input
-                  type="file"
-                  accept="image/*"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  className="hidden"
+              <div className="flex gap-3 mt-2">
+                <input 
+                  type="file" accept="image/*" ref={fileInputRef} className="hidden" 
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) setPreview(URL.createObjectURL(file));
+                  }} 
                 />
-
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="cursor-pointer bg-gradient-to-r from-lightorange to-darkorange rounded-xl transition-all hover:scale-105 py-1.5 px-3 text-white"
+                <button 
+                  onClick={() => fileInputRef.current?.click()} 
+                  className="cursor-pointer bg-orange-500 rounded-xl py-1.5 px-4 text-white hover:bg-orange-600 transition-colors"
                 >
-                  <p>Изменить</p>
+                  Изменить
                 </button>
-
-                <div
-                  onClick={handleDeleteAvatar}
-                  className="cursor-pointer bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all hover:scale-105 py-1.5 px-3"
+                <button 
+                  onClick={() => setPreview(null)} 
+                  className="cursor-pointer bg-gray-500/20 rounded-xl py-1.5 px-4 text-white hover:bg-gray-500/40 transition-colors"
                 >
-                  <p>Удалить</p>
-                </div>
+                  Удалить
+                </button>
               </div>
             </div>
           </div>
 
-          <div className="border-frostedglass border-b py-3" />
-
-          <div className="grid grid-cols-2 gap-10">
-            <div>
-              <Field>
-                <div className="flex flex-col gap-2">
-                  <Description className="text-sm pt-6 text-white/50">
-                    Имя пользователя
-                  </Description>
-                  <div className="relative">
-                    <Input
-                      type="text"
-                      className="outline-grey bg-frostedglass focus:outline-lightorange block w-full rounded-xl py-3 pl-5 text-sm/6 text-white outline-1"
-                      placeholder="Введите ваше имя"
-                    />
-                  </div>
-                </div>
-              </Field>
-            </div>
-
-            <div>
-              <Field>
-                <div className="flex flex-col gap-2">
-                  <Description className="text-sm pt-6 text-white/50">
-                    Email
-                  </Description>
-                  <div className="relative">
-                    <Input
-                      type="text"
-                      className="outline-grey bg-frostedglass focus:outline-lightorange block w-full rounded-xl py-3 pl-5 text-sm/6 text-white outline-1"
-                      placeholder="your@email.com"
-                    />
-                  </div>
-                </div>
-              </Field>
-            </div>
-          </div>
-
-          <div>
+          <div className="grid grid-cols-2 gap-10 mt-6">
             <Field>
-              <Description className="text-sm pt-4 text-white/50">
-                Биография
-              </Description>
-              <Textarea
-                className="mt-2 outline-grey bg-frostedglass focus:outline-lightorange block w-full rounded-xl py-3 pl-5 text-sm/6 text-white outline-1 resize-none"
-                rows={3}
-                placeholder="Расскажите о себе, ваших любимых жанрах и фильмах..."
+              <Description className="text-sm text-white/50 mb-2">Имя</Description>
+              <Input 
+                value={formData.username} 
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })} 
+                className="outline-grey bg-frostedglass focus:outline-lightorange block w-full rounded-xl py-3 pl-5 text-white outline-1" 
               />
             </Field>
-            <p className="text-grey/40 text-sm py-3">Максимум 200 символов</p>
-
-            <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex center transition-all hover:scale-101 h-13 cursor-pointer">
-              <p className="text-xl text-white">Сохранить изменения</p>
-            </div>
+            <Field>
+              <Description className="text-sm text-white/50 mb-2">Email</Description>
+              <Input 
+                value={formData.email} 
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })} 
+                className="outline-grey bg-frostedglass focus:outline-lightorange block w-full rounded-xl py-3 pl-5 text-white outline-1" 
+              />
+            </Field>
           </div>
+
+          <Field className="mt-6">
+            <Description className="text-sm text-white/50 mb-2">Биография</Description>
+            <Textarea 
+              value={formData.bio} 
+              onChange={(e) => setFormData({ ...formData, bio: e.target.value })} 
+              rows={3}
+              className="outline-grey bg-frostedglass focus:outline-lightorange block w-full rounded-xl py-3 pl-5 text-white outline-1 resize-none" 
+            />
+          </Field>
+
+          <button 
+            disabled={isSaving} 
+            onClick={() => { void handleSave(); }} 
+            className={`w-full mt-8 rounded-2xl flex items-center justify-center h-13 transition-all cursor-pointer
+              ${isSuccess ? 'bg-green-600' : 'bg-green-600 hover:bg-green-700'} 
+              disabled:opacity-50`}
+          >
+            {isSaving ? (
+              <Loader2 className="animate-spin text-white" />
+            ) : isSuccess ? (
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-white" />
+                <p className="text-white font-bold">Изменения сохранены</p>
+              </div>
+            ) : (
+              <p className="text-white font-bold">Сохранить изменения</p>
+            )}
+          </button>
         </div>
       </div>
 
       <div className="w-4/12 flex flex-col gap-6">
-        <div className="bg-glass border border-frostedglass flex flex-col gap-4 rounded-2xl p-6">
-          <div className="flex items-center gap-3">
+        <div className="bg-glass border border-frostedglass rounded-2xl p-6">
+          <div className="flex items-center gap-3 mb-4">
             <Shield className="text-green-500" />
-            <p className="text-white font-bold text-xl">Статус аккаунта</p>
+            <p className="text-white font-bold">Статус</p>
           </div>
-          <div className="flex items-center justify-between">
-            <p className="text-grey">Уровень</p>
-            <p className="text-lightorange">enthusiast</p>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <p className="text-grey">Присоединился</p>
-            <p className="text-white">янв. 2024 г.</p>
-          </div>
+          <p className="text-grey text-sm">Уровень: <span className="text-lightorange">enthusiast</span></p>
+          {/* Добавляем отображение даты регистрации для проверки */}
+          {formData.createdAt && (
+             <p className="text-grey text-[12px] mt-2 italic">
+               В системе с: {new Date(formData.createdAt).toLocaleDateString('ru-RU')}
+             </p>
+          )}
         </div>
-
-        <div className="bg-glass rounded-2xl border border-frostedglass py-5 px-6">
-          {session?.data ? (
-            <button
-              onClick={() => signOut({ callbackUrl: '/' })}
-              className="flex center gap-3 w-full bg-red-500/10 border border-red-500/20 hover:bg-red-500/25 transition-all hover:scale-102 p-4 rounded-2xl cursor-pointer"
-            >
-              <LogOut className="text-red-400" />
-              <div className="flex flex-col gap-1">
-                <p className="text-red-400">Выйти из аккаунта</p>
-                <p className="text-red-300/70 text-sm">Завершить сессию</p>
-              </div>
-            </button>
-          ) : null}
+        
+        <div className="flex center bg-frostedglass rounded-2xl border-white/32 p-5">
+          <button 
+            onClick={() => { void signOut({ callbackUrl: '/' }); }} 
+            className="flex items-center justify-center gap-3 w-full bg-red-500/10 p-4 rounded-2xl text-red-400 font-bold border border-red-500/20 hover:bg-red-500/20 transition-all cursor-pointer"
+          >
+            <LogOut /> Выйти
+          </button>
         </div>
       </div>
     </div>
