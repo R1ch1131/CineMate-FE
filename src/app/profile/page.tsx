@@ -1,10 +1,10 @@
 import { ProfileCard } from "~/widgets/ProfileCard";
 
-export default function HomePage() {
+export default function ProfilePage() {
   return (
-    <main>
-      <div className="flex justify-center">
-      <ProfileCard description={"Киноман и критик"} date={"21 января 2024 г."} />
+    <main className="min-h-screen ">
+      <div className="flex justify-center px-4">
+        <ProfileCard />
       </div>
     </main>
   );

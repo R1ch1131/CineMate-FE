@@ -1,4 +1,4 @@
+import { authOptions as importedOptions } from './../../configs/auth';
 import type { AuthOptions } from "next-auth";
-import { authConfig } from './../../configs/auth';
 
-export const authOptions: AuthOptions = authConfig;
+export const authOptions: AuthOptions = importedOptions;

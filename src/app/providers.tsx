@@ -1,10 +1,29 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { Layout } from '~/widgets/Layout/ui/Layout';
-import { SessionProvider } from 'next-auth/react';
+import { SessionProvider, signOut, useSession } from 'next-auth/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'; // опционально
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
+/**
+ * Внутренний компонент для обработки событий безопасности
+ */
+const AuthEventsHandler = ({ children }: { children: ReactNode }) => {
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    // Если сервер пометил сессию ошибкой "RefreshAccessTokenError"
+    if (session?.error === "RefreshAccessTokenError") {
+      console.warn("⚠️ [FRONTEND] Обнаружена ошибка токена. Выход...");
+      
+      // Вызываем логаут и редирект
+      signOut({ callbackUrl: "/" });
+    }
+  }, [session]);
+
+  return <>{children}</>;
+};
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,9 +39,12 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   return (
     <QueryClientProvider client={queryClient}>
       <SessionProvider>
-        <Layout>
-          {children}
-        </Layout>
+        {/* Обработчик должен быть ВНУТРИ SessionProvider */}
+        <AuthEventsHandler>
+          <Layout>
+            {children}
+          </Layout>
+        </AuthEventsHandler>
       </SessionProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
