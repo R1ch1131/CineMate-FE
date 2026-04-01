@@ -10,8 +10,8 @@ declare module "next-auth" {
     accessToken: string;
     refreshToken: string;
     accessTokenExpires: number;
-    bio?: string;      // Добавлено
-    createdAt?: string; // Добавлено
+    bio?: string;     
+    createdAt?: string; 
   }
   interface Session {
     user: User;
@@ -26,8 +26,8 @@ declare module "next-auth/jwt" {
     accessTokenExpires: number;
     name?: string;
     email?: string;
-    bio?: string;      // Добавлено
-    createdAt?: string; // Добавлено
+    bio?: string;     
+    createdAt?: string;
     error?: string;
   }
 }
@@ -89,8 +89,8 @@ export const authOptions: AuthOptions = {
             id: credentials.email,
             email: credentials.email,
             name: data.username,
-            bio: data.bio,           // Берем из ответа бэкенда
-            createdAt: data.createdAt, // Берем из ответа бэкенда
+            bio: data.bio,           
+            createdAt: data.createdAt, 
             accessToken: data.token, 
             refreshToken: data.refreshToken,
             accessTokenExpires: Date.now() + 15 * 60 * 1000, 
@@ -103,7 +103,6 @@ export const authOptions: AuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user, trigger, session }) {
-      // ПЕРВЫЙ ВХОД
       if (user) {
         return {
           ...token,
@@ -117,7 +116,6 @@ export const authOptions: AuthOptions = {
         };
       }
 
-      // ОБНОВЛЕНИЕ (trigger "update")
       if (trigger === "update" && session?.user) {
         console.log("🔄 [JWT UPDATE] Обновляем поля:", Object.keys(session.user));
         return {

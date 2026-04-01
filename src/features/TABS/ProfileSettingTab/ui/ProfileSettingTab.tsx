@@ -3,7 +3,7 @@
 import { Description, Field, Input, Textarea } from "@headlessui/react";
 import { Edit3, LogOut, Shield, Loader2, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import noAvatar from "~/shared/assets/icons/noAvatar.jpg";
 import { useSession, signOut } from 'next-auth/react';
 
@@ -11,18 +11,16 @@ interface ProfileSettingTabProps {
   onUpdate?: () => void;
 }
 
-// Интерфейс для локального состояния формы
 interface FormState {
   username: string;
   email: string;
   bio: string;
-  createdAt: string; // Добавлено для сохранения даты в цепочке обновлений
+  createdAt: string; 
 }
 
 export const ProfileSettingTab = ({ onUpdate }: ProfileSettingTabProps) => {
   const { data: session, update } = useSession();
   
-  // Безопасное получение токена и пользователя
   const user = session?.user;
   const token = (user as { accessToken?: string })?.accessToken;
 
@@ -45,7 +43,6 @@ export const ProfileSettingTab = ({ onUpdate }: ProfileSettingTabProps) => {
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Синхронизация данных из сессии в форму
   useEffect(() => {
     if (user) {
       const data: FormState = {
@@ -66,7 +63,6 @@ export const ProfileSettingTab = ({ onUpdate }: ProfileSettingTabProps) => {
     setIsSuccess(false);
 
     try {
-      // 1. Обновление Username
       if (formData.username !== initialData.username) {
         await fetch('/api/profile/username', {
           method: 'PUT',
@@ -75,7 +71,6 @@ export const ProfileSettingTab = ({ onUpdate }: ProfileSettingTabProps) => {
         });
       }
 
-      // 2. Обновление Email
       if (formData.email !== initialData.email) {
         await fetch('/api/profile/email', {
           method: 'PUT',
@@ -84,7 +79,6 @@ export const ProfileSettingTab = ({ onUpdate }: ProfileSettingTabProps) => {
         });
       }
 
-      // 3. Обновление Bio
       if (formData.bio !== initialData.bio) {
         await fetch('/api/profile/bio', {
           method: 'PUT',
@@ -93,18 +87,13 @@ export const ProfileSettingTab = ({ onUpdate }: ProfileSettingTabProps) => {
         });
       }
 
-      /**
-       * КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ:
-       * Мы передаем createdAt обратно в update, чтобы колбэк jwt в auth.ts 
-       * не получил undefined и не затер дату в токене.
-       */
       await update({
         user: {
           ...user,
           name: formData.username,
           email: formData.email,
           bio: formData.bio,
-          createdAt: formData.createdAt // Передаем дату регистрации дальше
+          createdAt: formData.createdAt 
         }
       });
 
