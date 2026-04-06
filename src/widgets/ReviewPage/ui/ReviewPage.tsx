@@ -1,52 +1,95 @@
-import React from "react";
+"use client";
+
+import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { useQuery, useQueryClient } from "@tanstack/react-query"; 
+import { Loader2 } from "lucide-react";
 import { HotDebate } from "./HotDebate";
 import { SearchBar } from "./SearchBar";
-import { NewReviewButton } from "./NewReviewButton";
-import { useState } from "react";
+import { ReviewForm } from "./ReviewForm";
 import { ReviewCols } from "./ReviewCols";
-import { REVIEW_TABS, TAB_DATA} from './../lib/constants';
-import { Filter } from "lucide-react";
+import type { Review } from "./ReviewCols"; 
+import { REVIEW_TABS } from "../lib/constants";
+
+
+interface ReviewsResponse {
+  content: Review[];
+  totalElements: number;
+  totalPages?: number;
+  size?: number;
+  number?: number;
+}
 
 export const ReviewPage = () => {
+  const { data: session, status } = useSession();
   const [activeTab, setActiveTab] = useState(0);
+  const queryClient = useQueryClient(); 
 
-  const currentReviewsCount = TAB_DATA[activeTab]?.length ?? 0;
-  
-  const currentTabName = REVIEW_TABS[activeTab]?.name ?? "Все рецензии";
+  // Получаем текущий таб безопасно
+  const currentTab = REVIEW_TABS[activeTab] ?? REVIEW_TABS[0];
+
+  const { data, isLoading, isFetching } = useQuery<ReviewsResponse>({
+    queryKey: ["reviews", activeTab, session?.user?.id],
+    queryFn: async () => {
+      const tab = REVIEW_TABS[activeTab];
+      if (!tab) throw new Error("Таб не найден");
+
+      let url = `${tab.endpoint}?page=0&size=20`;
+      
+      if (tab.id === "my" && session?.user?.id) {
+        url = `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/user/${session.user.id}?page=0&size=20`;
+      } else {
+        url = `${process.env.NEXT_PUBLIC_API_URL}${tab.endpoint}?page=0&size=20`;
+      }
+
+      const response = await fetch(url, {
+        headers: {
+          "Accept": "application/json",
+          ...(session?.user?.accessToken && {
+            "Authorization": `Bearer ${session.user.accessToken}`,
+          }),
+        },
+      });
+
+      if (!response.ok) throw new Error("Ошибка загрузки");
+      
+      return (await response.json()) as ReviewsResponse;
+    },
+    enabled: status !== "loading",
+    placeholderData: (previousData) => previousData,
+  });
+
+  const handleRefresh = async () => {
+  try {
+    await queryClient.invalidateQueries({ queryKey: ["reviews"] });
+    console.log("Данные успешно обновлены");
+  } catch (error) {
+    console.error("Ошибка при обновлении:", error);
+  }
+};
+
+  const reviews = data?.content ?? [];
+  const totalElements = data?.totalElements ?? 0;
 
   return (
-    <div>
-      <div className="flex flex-col items-center justify-center gap-4 pb-8">
-        <p className="text-4xl font-bold text-white">Рецензии</p>
-        <span className="flex flex-col items-center gap-1">
-          <p className="text-grey">
-            Читайте мнения других киноманов, делитесь своими впечатлениями и
-          </p>
-          <p className="text-grey">учавствуйте в обсуждениях</p>
-        </span>
-      </div>
-      <div className="flex justify-center">
-        <div className="flex w-4/6 gap-10">
-          <div className="flex w-4/12 flex-col gap-5">
-            <NewReviewButton />
-            <div className="bg-glass border border-frostedglass rounded-2xl p-7">
-              <span className="flex gap-2 text-white pb-4 ">
-                <Filter />
-                <p>Фильтры</p>
-              </span>
-              <ul className="flex flex-col gap-2">
+    <div className="min-h-screen">
+      <div className="flex justify-center px-4 pt-10">
+        <div className="flex w-full lg:w-4/6 gap-10">
+          
+          <div className="hidden md:flex w-4/12 flex-col gap-6">
+            <ReviewForm onSuccess={handleRefresh} />
+            
+            <div className="bg-glass border border-frostedglass rounded-2xl p-6 shadow-xl">
+               <ul className="flex flex-col gap-2">
                 {REVIEW_TABS.map((tab, index) => (
                   <li key={tab.id}>
                     <button
                       onClick={() => setActiveTab(index)}
-                      className={`w-full py-3 px-4 hover:bg-frostedglass transition rounded-2xl flex items-center gap-2 ${
-                        activeTab === index 
-                          ? "bg-lightorange hover:bg-lightorange" 
-                          : "text-gray-300"
+                      className={`w-full py-3 px-4 transition-all rounded-xl flex items-center gap-3 ${
+                        activeTab === index ? "bg-lightorange text-white" : "text-gray-400 hover:bg-white/5"
                       }`}
                     >
-                      {tab.icon}
-                      {tab.name}
+                      {tab.icon} <span className="text-sm font-medium">{tab.name}</span>
                     </button>
                   </li>
                 ))}
@@ -54,13 +97,25 @@ export const ReviewPage = () => {
             </div>
             <HotDebate />
           </div>
-          <div className="w-11/12">
-            <SearchBar 
-              reviewsCount={currentReviewsCount} 
-              tabName={currentTabName} 
-            />
-            <div className="flex flex-col gap-5 pt-5">
-              <ReviewCols reviews={TAB_DATA[activeTab]!} />
+
+          <div className="w-full md:w-8/12">
+            <SearchBar reviewsCount={totalElements} tabName={currentTab.name} />
+            
+            <div className="mt-6 min-h-125 relative">
+              {isFetching && !isLoading && (
+                <div className="absolute -top-7.5 right-0 flex items-center gap-2 text-[11px] text-lightorange font-bold uppercase tracking-tighter animate-pulse">
+                  <Loader2 size={12} className="animate-spin" />
+                  Обновление данных...
+                </div>
+              )}
+
+              {isLoading ? (
+                <div className="flex justify-center py-32">
+                  <Loader2 className="animate-spin text-lightorange" size={40} />
+                </div>
+              ) : (
+                <ReviewCols reviews={reviews} onActionSuccess={handleRefresh} />
+              )}
             </div>
           </div>
         </div>

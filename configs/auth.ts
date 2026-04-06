@@ -21,6 +21,7 @@ declare module "next-auth" {
 
 declare module "next-auth/jwt" {
   interface JWT {
+    id: string;
     accessToken: string;
     refreshToken: string;
     accessTokenExpires: number;
@@ -32,11 +33,6 @@ declare module "next-auth/jwt" {
   }
 }
 
-const formatToken = (token: string) => {
-  if (!token) return "null";
-  return `${token.substring(0, 10)}...${token.substring(token.length - 10)}`;
-};
-
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh`, {
@@ -45,22 +41,28 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       body: JSON.stringify({ refreshToken: token.refreshToken }),
     });
 
-    const text = await response.text(); 
-    if (!text) throw new Error("Empty response");
-    const data = JSON.parse(text);
+    const data = await response.json();
 
-    if (!response.ok) throw data;
+    if (!response.ok) {
+      console.error("[NEXT-AUTH] Refresh token failed", data);
+      throw data;
+    }
 
+    // Если бэкенд прислал новый refreshToken, записываем его. 
+    // Если нет (хотя при ротации должен), оставляем старый.
     return {
       ...token,
       accessToken: data.token, 
       refreshToken: data.refreshToken ?? token.refreshToken,
-      accessTokenExpires: Date.now() + 15 * 60 * 1000, 
+      accessTokenExpires: Date.now() + 60 * 60 * 1000, 
       error: undefined,
     };
   } catch (error) {
-    console.error("[NEXT-AUTH] Refresh error:", error);
-    return { ...token, error: "RefreshAccessTokenError" };
+    console.error("[NEXT-AUTH] Refresh Error:", error);
+    return {
+      ...token,
+      error: "RefreshAccessTokenError",
+    };
   }
 }
 
@@ -76,26 +78,49 @@ export const authOptions: AuthOptions = {
         if (!credentials?.email || !credentials?.password) return null;
 
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/sign-in`, {
+          const loginRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/sign-in`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(credentials),
           });
 
-          const data = await response.json();
-          if (!response.ok) throw new Error(data.error || "Login failed");
+          const loginData = await loginRes.json();
+          if (!loginRes.ok) throw new Error(loginData.error || "Login failed");
+
+          const token = loginData.token;
+
+          const profileRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/profile/me`, {
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Accept": "application/json",
+            },
+          });
+
+          let userId = "";
+          let profileData: any = null;
+
+          if (profileRes.ok) {
+            profileData = await profileRes.ok ? await profileRes.json() : null;
+            userId = profileData?.id;
+          }
+
+          if (!userId) {
+            console.error("[NEXT-AUTH] UUID not found via /me");
+            return null;
+          }
 
           return {
-            id: credentials.email,
+            id: userId,
+            name: profileData?.username || credentials.email.split('@')[0],
             email: credentials.email,
-            name: data.username,
-            bio: data.bio,           
-            createdAt: data.createdAt, 
-            accessToken: data.token, 
-            refreshToken: data.refreshToken,
-            accessTokenExpires: Date.now() + 15 * 60 * 1000, 
+            accessToken: token, 
+            refreshToken: loginData.refreshToken,
+            accessTokenExpires: Date.now() + 60 * 60 * 1000, 
+            bio: profileData?.bio,
+            createdAt: profileData?.createdAt
           };
         } catch (error) {
+          console.error("[NEXT-AUTH] Authorize error:", error);
           return null;
         }
       },
@@ -103,9 +128,11 @@ export const authOptions: AuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user, trigger, session }) {
+      // 1. ПЕРВИЧНЫЙ ВХОД
       if (user) {
         return {
           ...token,
+          id: user.id,
           accessToken: user.accessToken,
           refreshToken: user.refreshToken,
           accessTokenExpires: user.accessTokenExpires,
@@ -116,8 +143,8 @@ export const authOptions: AuthOptions = {
         };
       }
 
+      // 2. ОБНОВЛЕНИЕ ПРОФИЛЯ
       if (trigger === "update" && session?.user) {
-        console.log("🔄 [JWT UPDATE] Обновляем поля:", Object.keys(session.user));
         return {
           ...token,
           name: session.user.name ?? token.name,
@@ -127,22 +154,26 @@ export const authOptions: AuthOptions = {
         };
       }
 
-      // ПРОВЕРКА ВРЕМЕНИ
+      // 3. ПРОВЕРКА ВРЕМЕНИ ЖИЗНИ
+      // Если до конца жизни токена больше 10 секунд, просто возвращаем текущий
       if (Date.now() < token.accessTokenExpires - 10000) {
         return token;
       }
 
+      // 4. ТОКЕН ИСТЕК — ЗАПУСКАЕМ РЕФРЕШ
       return await refreshAccessToken(token);
     },
 
     async session({ session, token }) {
       if (session.user) {
+        session.user.id = token.id;
         session.user.accessToken = token.accessToken;
         session.user.refreshToken = token.refreshToken;
         session.user.name = token.name;
         session.user.email = token.email as string;
         session.user.bio = token.bio;
         session.user.createdAt = token.createdAt;
+        session.user.accessTokenExpires = token.accessTokenExpires;
         session.error = token.error;
       }
       return session;
