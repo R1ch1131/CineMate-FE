@@ -30,6 +30,7 @@ interface Comment {
   content: string;
   likesCount: number;
   createdAt: string;
+  parentId?: string;
   replies?: Comment[];
 }
 
@@ -503,10 +504,25 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
           userImage={Ava}
           comments={comments}
           isLoading={isLoadingComments}
-          onCommentSent={() => {
-            void fetchComments();
+          onCommentSent={(newComment) => {
+            // Оптимистично добавляем новый комментарий сразу
+            if (newComment.parentId) {
+              // Это ответ - добавляем как reply к родительскому комментарию
+              setComments(prev => 
+                prev.map(comment => 
+                  comment.id === newComment.parentId
+                    ? { ...comment, replies: [newComment, ...(comment.replies || [])] }
+                    : comment
+                )
+              );
+            } else {
+              // Это обычный комментарий
+              setComments(prev => [newComment, ...prev]);
+            }
             setLocalCommentsCount(prev => prev + 1);
-            onActionSuccess?.();
+            // Фоновая синхронизация с сервером (НЕ вызывает полный рефетч Reviews)
+            void fetchComments();
+            // НЕ вызываем onActionSuccess?.() чтобы не триггерить рефетч всех рецензий
           }}
         />
       )}
