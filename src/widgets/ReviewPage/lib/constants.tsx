@@ -5,24 +5,24 @@ export const REVIEW_TABS = [
     name: "Все рецензии",
     icon: <Eye size={18} />,
     id: "all",
-    endpoint: "/api/reviews", 
+    endpoint: "/reviews",
   },
  {
     name: "Избранные",
     icon: <Bookmark size={18} />,
     id: "favorites",
-    endpoint: "/api/reviews/favorites", 
+    endpoint: "/reviews/favorites",
   },
 {
     name: "Мои рецензии",
     icon: <Star size={18} />,
     id: "my",
-    endpoint: "/api/reviews/user", 
+    endpoint: "/reviews/user",
   },
   {
     name: "Рекомендации",
     icon: <TrendingUp size={18} />,
     id: "recommended",
-    endpoint: "/api/reviews", //чет придумать с реками
+    endpoint: "/reviews",
   },
 ] as const;
