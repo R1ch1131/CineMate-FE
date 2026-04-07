@@ -15,7 +15,7 @@ interface PopupProps {
 }
 
 const fetchMovieDetails = async (movieId: number): Promise<MovieDetails> => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/movies/${movieId}`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/movies/${movieId}`);
 
   if (!res.ok) {
     throw new Error("Ошибка при загрузке данных фильма");

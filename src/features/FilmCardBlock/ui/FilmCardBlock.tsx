@@ -27,7 +27,7 @@ const ITEMS_PER_PAGE = 20;
 // ✅ fetch all pages from backend for a category
 const fetchMovies = async (category: Category): Promise<Movie[]> => {
   if (category === "all") {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/movies/list/all`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/movies/list/all`);
     if (!res.ok) throw new Error("Ошибка загрузки");
 
     // ✅ Явно типизируем результат
@@ -38,7 +38,7 @@ const fetchMovies = async (category: Category): Promise<Movie[]> => {
     return data.map(item => item as Movie);
   }
 
-  const BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/movies/${category}`;
+  const BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}/movies/${category}`;
   let page = 0;
   const size = 20;
   let allMovies: Movie[] = [];

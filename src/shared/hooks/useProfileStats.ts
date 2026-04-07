@@ -20,7 +20,7 @@ export function useProfileStats() {
 
       // Загружаем все рецензии пользователя (пагинация с большим размером)
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/user/${userId}?page=0&size=1000`,
+        `${process.env.NEXT_PUBLIC_API_URL}/reviews/user/${userId}?page=0&size=1000`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

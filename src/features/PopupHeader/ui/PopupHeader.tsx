@@ -27,7 +27,7 @@ export const PopupHeader = ({ movie, onTabChange }: PopupHeaderProps) => {
       const token = session?.user?.accessToken;
       if (!token) throw new Error("Необходима авторизация");
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/watchlist/${movie.id}/status`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/watchlist/${movie.id}/status`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

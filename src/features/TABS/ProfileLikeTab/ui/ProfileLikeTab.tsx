@@ -19,7 +19,7 @@ export const ProfileLikeTab = () => {
     queryKey: ["favorite-reviews", session?.user?.id],
     queryFn: async (): Promise<PaginatedResponse<Review>> => {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/favorites?page=0&size=100`,
+        `${process.env.NEXT_PUBLIC_API_URL}/reviews/favorites?page=0&size=100`,
         {
           headers: {
             Authorization: `Bearer ${session?.user?.accessToken}`,

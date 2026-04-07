@@ -14,7 +14,7 @@ export const ProfileReviewsTab = () => {
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["my-reviews", selectedOption.value, session?.user?.id],
     queryFn: async () => {
-      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/user/${session?.user?.id}?page=0&size=100`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/reviews/user/${session?.user?.id}?page=0&size=100`;
       const res = await fetch(url, {
         headers: {
           Authorization: `Bearer ${session?.user?.accessToken}`,

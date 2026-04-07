@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     const session = await getServerSession(authOptions);
 
     // Запрашиваем данные у реального бэкенда
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews?page=${page}&size=${size}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews?page=${page}&size=${size}`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
       isSpoiler: Boolean(body.isSpoiler),
     };
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

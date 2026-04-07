@@ -15,8 +15,8 @@ import Link from "next/link";
 const fetchWatchlist = async (token?: string, status?: string) => {
   // Формируем URL в зависимости от выбранной вкладки
   const url = status && status !== "all"
-    ? `${process.env.NEXT_PUBLIC_API_URL}/api/watchlist/all?status=${status}`
-    : `${process.env.NEXT_PUBLIC_API_URL}/api/watchlist/all`;
+    ? `${process.env.NEXT_PUBLIC_API_URL}/watchlist/all?status=${status}`
+    : `${process.env.NEXT_PUBLIC_API_URL}/watchlist/all`;
 
   const res = await fetch(url, {
     headers: {
