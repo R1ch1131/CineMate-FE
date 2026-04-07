@@ -30,7 +30,7 @@ type Movie = {
 };
 
 const fetchNewReleases = async (): Promise<Movie[]> => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/movies/new-releases`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/movies/new-releases`);
   if (!res.ok) throw new Error("Ошибка при загрузке фильмов");
   return res.json() as Promise<Movie[]>;
 };
@@ -44,7 +44,7 @@ const fetchReviews = async (token?: string): Promise<Review[]> => {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews?page=0&size=4`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews?page=0&size=4`, {
     headers
   });
 

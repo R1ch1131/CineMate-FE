@@ -140,7 +140,7 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
 
     setIsDeleting(true);
     try {
-      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/${review.id}`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/reviews/${review.id}`;
       const res = await fetch(url, {
         method: "DELETE",
         headers: {
@@ -164,7 +164,7 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
 
   const { mutate: toggleLike } = useMutation({
     mutationFn: async () => {
-      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/${review.id}/like`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/reviews/${review.id}/like`;
       const res = await fetch(url, {
         method: "POST",
         headers: {
@@ -228,7 +228,7 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
   const { mutate: toggleFavorite } = useMutation({
     mutationFn: async (isCurrentlyFavorited: boolean) => {
       const method = isCurrentlyFavorited ? "DELETE" : "POST";
-      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/${review.id}/favorite`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/reviews/${review.id}/favorite`;
 
       const res = await fetch(url, {
         method: method,

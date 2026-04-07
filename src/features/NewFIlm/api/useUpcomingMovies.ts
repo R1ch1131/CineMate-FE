@@ -12,7 +12,7 @@ interface Movie {
 }
 
 const fetchUpcomingMovies = async (): Promise<Movie[]> => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/movies/upcoming`);
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/movies/upcoming`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch movies');

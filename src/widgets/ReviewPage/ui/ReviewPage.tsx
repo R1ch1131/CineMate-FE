@@ -37,7 +37,7 @@ export const ReviewPage = () => {
       let url = `${tab.endpoint}?page=0&size=20`;
       
       if (tab.id === "my" && session?.user?.id) {
-        url = `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/user/${session.user.id}?page=0&size=20`;
+        url = `${process.env.NEXT_PUBLIC_API_URL}/reviews/user/${session.user.id}?page=0&size=20`;
       } else {
         url = `${process.env.NEXT_PUBLIC_API_URL}${tab.endpoint}?page=0&size=20`;
       }

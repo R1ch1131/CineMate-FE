@@ -55,7 +55,7 @@ declare module "next-auth/jwt" {
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken: token.refreshToken }),
@@ -98,7 +98,7 @@ export const authOptions: AuthOptions = {
         if (!credentials?.email || !credentials?.password) return null;
 
         try {
-          const loginRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/sign-in`, {
+          const loginRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/sign-in`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(credentials),
@@ -109,7 +109,7 @@ export const authOptions: AuthOptions = {
 
           const token = loginData.token;
 
-          const profileRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/profile/me`, {
+          const profileRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile/me`, {
             headers: {
               "Authorization": `Bearer ${token}`,
               "Accept": "application/json",
