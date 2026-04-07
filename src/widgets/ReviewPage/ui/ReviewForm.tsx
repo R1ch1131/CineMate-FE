@@ -136,7 +136,7 @@ export const ReviewForm = ({ initialData, isEdit = false, onSuccess, trigger }: 
     setIsSubmitting(true);
 
     try {
-      const url = isEdit && initialData ? `/api/reviews/${initialData.id}` : '/api/reviews';
+      const url = isEdit && initialData ? `/reviews/${initialData.id}` : '/reviews';
       const method = isEdit ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
