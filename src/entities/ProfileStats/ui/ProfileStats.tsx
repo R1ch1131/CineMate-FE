@@ -1,9 +1,10 @@
 import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
 
 interface ProfileStatsProps{
     icon?: LucideIcon
     iconColor?: string,
-    count: string,
+    count: string | ReactNode,
     text:string,
 }
 

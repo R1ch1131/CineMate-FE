@@ -135,11 +135,6 @@ export const FilmCard = ({ movie, variant = 'grid' }: FilmCardProps) => {
               )}
 
               <div className="flex justify-end ml-auto">
-                <Property
-                  text="Новинка"
-                  color="bg-green-500/80 border-green-500 !py-0 !px-0.5 !rounded-sm"
-                  textColor="!text-sm"
-                />
               </div>
             </div>
           </div>
