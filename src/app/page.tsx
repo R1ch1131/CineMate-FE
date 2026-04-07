@@ -66,16 +66,17 @@ export default function HomePage() {
     queryFn: fetchNewReleases,
   });
 
-  const { 
-    data: reviews, 
+  const {
+    data: reviews,
     isLoading: isReviewsLoading,
-    isFetching: isReviewsFetching, // 1. Добавили отслеживание фонового обновления
+    isFetching: isReviewsFetching,
     error: reviewsError,
-    refetch: refetchReviews 
+    refetch: refetchReviews
   } = useQuery<Review[]>({
     queryKey: ["home-reviews", session?.user?.accessToken, status],
     queryFn: () => fetchReviews(session?.user?.accessToken),
-    enabled: status !== "loading", 
+    enabled: status !== "loading",
+    placeholderData: (previousData) => previousData,
   });
 
   return (

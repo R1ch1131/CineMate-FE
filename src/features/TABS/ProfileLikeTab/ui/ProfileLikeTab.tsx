@@ -1,36 +1,55 @@
-import { Heart, Star } from "lucide-react";
-import React from "react";
+"use client";
 
-export const ProfileLikeTab = () =>{
-    return(
-        <div className="pt-3">
-            <div className="flex justify-between ">
-            <p className="text-white font-bold text-3xl pb-6">Избранные рецензии</p>
-            <p className="text-grey">1 Рецензия</p>
-            </div>
-            <div className="bg-glass border border-frostedglass rounded-2xl p-6 flex flex-col gap-2 text-grey">
-                <div className="flex justify-between ">
-                <p className="text-white">Дюна: Часть вторая</p>
-                <span className="flex gap-2 items-center text-amber-500">
-                    <Star className="fill-current h-6 w-6" />
-                    <p className="font-bold">4.8</p>
-                </span>
-                </div>
-                <span className="flex gap-1">
-                    <p>Автор:</p>
-                    <p>Анна Кинокритик</p>
-                </span>
-                <p>Невероятная кинематография и звуковое сопровождение...</p>
-                <div>
-                    <span className="flex gap-5">
-                        <p>09.08.2024</p>
-                        <div className="flex gap-1 items-center">
-                            <Heart className="text-red-500 h-5 w-5"/>
-                            <p>142 лайка</p>
-                        </div>
-                    </span>
-                </div>
-            </div>
-        </div>
-    )
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
+import { Loader2 } from "lucide-react";
+import { ReviewCols, type Review } from "~/widgets/ReviewPage/ui/ReviewCols";
+
+interface PaginatedResponse<T> {
+  content: T[];
+  totalElements?: number;
+  totalPages?: number;
 }
+
+export const ProfileLikeTab = () => {
+  const { data: session } = useSession();
+
+  const { data, isLoading, refetch } = useQuery<PaginatedResponse<Review>>({
+    queryKey: ["favorite-reviews", session?.user?.id],
+    queryFn: async (): Promise<PaginatedResponse<Review>> => {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/favorites?page=0&size=100`,
+        {
+          headers: {
+            Authorization: `Bearer ${session?.user?.accessToken}`,
+          },
+        }
+      );
+      if (!res.ok) return { content: [] };
+      return (await res.json()) as PaginatedResponse<Review>;
+    },
+    enabled: !!session?.user?.id,
+  });
+
+  const reviews = data?.content ?? [];
+
+  return (
+    <div className="pt-3">
+      <div className="flex justify-between items-center mb-8 px-2">
+        <p className="text-white font-bold text-3xl uppercase tracking-tight">
+          Избранные рецензии
+        </p>
+        <p className="text-grey">{data?.totalElements ?? reviews.length} Рецензий</p>
+      </div>
+
+      {isLoading ? (
+        <div className="flex justify-center py-20">
+          <Loader2 className="animate-spin text-lightorange" size={40} />
+        </div>
+      ) : (
+        <ReviewCols reviews={reviews} onActionSuccess={() => void refetch()} />
+      )}
+    </div>
+  );
+};

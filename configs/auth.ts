@@ -2,6 +2,26 @@ import type { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { JWT } from "next-auth/jwt";
 
+interface ProfileData {
+  id: string;
+  username?: string;
+  email?: string;
+  bio?: string;
+  createdAt?: string;
+}
+
+interface LoginResponse {
+  token: string;
+  refreshToken: string;
+  error?: string;
+}
+
+interface RefreshResponse {
+  token: string;
+  refreshToken?: string;
+  error?: string;
+}
+
 declare module "next-auth" {
   interface User {
     id: string;
@@ -25,9 +45,9 @@ declare module "next-auth/jwt" {
     accessToken: string;
     refreshToken: string;
     accessTokenExpires: number;
-    name?: string;
-    email?: string;
-    bio?: string;     
+    name?: string | null;
+    email?: string | null;
+    bio?: string;
     createdAt?: string;
     error?: string;
   }
@@ -41,20 +61,20 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       body: JSON.stringify({ refreshToken: token.refreshToken }),
     });
 
-    const data = await response.json();
+    const data = (await response.json()) as RefreshResponse;
 
     if (!response.ok) {
       console.error("[NEXT-AUTH] Refresh token failed", data);
-      throw data;
+      throw new Error(data.error ?? "RefreshAccessTokenError");
     }
 
-    // Если бэкенд прислал новый refreshToken, записываем его. 
-    // Если нет (хотя при ротации должен), оставляем старый.
     return {
       ...token,
-      accessToken: data.token, 
+      // Бэк всегда присылает новый refreshToken при ротации
       refreshToken: data.refreshToken ?? token.refreshToken,
-      accessTokenExpires: Date.now() + 60 * 60 * 1000, 
+      accessToken: data.token,
+      // Фиксированная длительность 1 час (бэк не присылает expiresIn)
+      accessTokenExpires: Date.now() + 60 * 60 * 1000,
       error: undefined,
     };
   } catch (error) {
@@ -84,8 +104,8 @@ export const authOptions: AuthOptions = {
             body: JSON.stringify(credentials),
           });
 
-          const loginData = await loginRes.json();
-          if (!loginRes.ok) throw new Error(loginData.error || "Login failed");
+          const loginData = (await loginRes.json()) as LoginResponse;
+          if (!loginRes.ok) throw new Error(loginData.error ?? "Login failed");
 
           const token = loginData.token;
 
@@ -97,11 +117,11 @@ export const authOptions: AuthOptions = {
           });
 
           let userId = "";
-          let profileData: any = null;
+          let profileData: ProfileData | null = null;
 
           if (profileRes.ok) {
-            profileData = await profileRes.ok ? await profileRes.json() : null;
-            userId = profileData?.id;
+            profileData = await profileRes.json() as ProfileData;
+            userId = profileData?.id ?? "";
           }
 
           if (!userId) {
@@ -111,11 +131,12 @@ export const authOptions: AuthOptions = {
 
           return {
             id: userId,
-            name: profileData?.username || credentials.email.split('@')[0],
+            name: profileData?.username ?? credentials.email.split('@')[0],
             email: credentials.email,
-            accessToken: token, 
+            accessToken: token,
             refreshToken: loginData.refreshToken,
-            accessTokenExpires: Date.now() + 60 * 60 * 1000, 
+            // Бэк не присылает время жизни — фиксированная длительность 1 час
+            accessTokenExpires: Date.now() + 60 * 60 * 1000,
             bio: profileData?.bio,
             createdAt: profileData?.createdAt
           };
@@ -144,19 +165,28 @@ export const authOptions: AuthOptions = {
       }
 
       // 2. ОБНОВЛЕНИЕ ПРОФИЛЯ
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (trigger === "update" && session?.user) {
         return {
           ...token,
-          name: session.user.name ?? token.name,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          name: session.user.name,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           email: session.user.email ?? token.email,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           bio: session.user.bio ?? token.bio,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           createdAt: session.user.createdAt ?? token.createdAt,
         };
       }
 
       // 3. ПРОВЕРКА ВРЕМЕНИ ЖИЗНИ
       // Если до конца жизни токена больше 10 секунд, просто возвращаем текущий
-      if (Date.now() < token.accessTokenExpires - 10000) {
+      if (!token.accessTokenExpires || Date.now() < token.accessTokenExpires - 10000) {
+        // Если была ошибка рефреша — всё ещё помечаем
+        if (token.error === "RefreshAccessTokenError") {
+          return { ...token };
+        }
         return token;
       }
 
@@ -165,16 +195,24 @@ export const authOptions: AuthOptions = {
     },
 
     async session({ session, token }) {
+      // Если при рефреше произошла ошибка — разлогиниваем
+      if (token.error === "RefreshAccessTokenError") {
+        return {
+          ...session,
+          error: "RefreshAccessTokenError",
+          user: null!,
+        };
+      }
+
       if (session.user) {
         session.user.id = token.id;
         session.user.accessToken = token.accessToken;
         session.user.refreshToken = token.refreshToken;
-        session.user.name = token.name;
-        session.user.email = token.email as string;
+        session.user.name = token.name ?? undefined;
+        session.user.email = token.email ?? "";
         session.user.bio = token.bio;
         session.user.createdAt = token.createdAt;
         session.user.accessTokenExpires = token.accessTokenExpires;
-        session.error = token.error;
       }
       return session;
     },
