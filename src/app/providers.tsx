@@ -16,8 +16,13 @@ const AuthEventsHandler = ({ children }: { children: ReactNode }) => {
     // Если сервер пометил сессию ошибкой "RefreshAccessTokenError"
     if (session?.error === "RefreshAccessTokenError") {
       console.warn("⚠️ [FRONTEND] Обнаружена ошибка токена. Выход...");
-      
-      // Вызываем логаут и редирект
+      signOut({ callbackUrl: "/" });
+      return;
+    }
+
+    // Если user стал null из-за ошибки рефреша
+    if (session && !session.user) {
+      console.warn("⚠️ [FRONTEND] Сессия пуста. Выход...");
       signOut({ callbackUrl: "/" });
     }
   }, [session]);

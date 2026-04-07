@@ -125,14 +125,14 @@ export const ProfileCard = () => {
         <TabList className="bg-glass flex h-15 2k:h-17 items-center rounded-xl">
           <Tab className={tabStyle}>Обзор</Tab>
           <Tab className={tabStyle}>Рецензии</Tab>
-          <Tab className={tabStyle}>Избранное</Tab>
+          {/* <Tab className={tabStyle}>Избранное</Tab> */}
           <Tab className={tabStyle}>Споры</Tab>
           <Tab className={tabStyle}>Настройки</Tab>
         </TabList>
         <TabPanels className="mt-3">
           <TabPanel><ProfileViewTab /></TabPanel>
           <TabPanel><ProfileReviewsTab /></TabPanel>
-          <TabPanel><ProfileLikeTab /></TabPanel>
+          {/* <TabPanel><ProfileLikeTab /></TabPanel> */}
           <TabPanel><ProfileDebateTab /></TabPanel>
           <TabPanel><ProfileSettingTab onUpdate={() => { void fetchProfile(); }} /></TabPanel>
         </TabPanels>

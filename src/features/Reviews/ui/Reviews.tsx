@@ -22,6 +22,7 @@ import { CommentSection } from "./CommentSection";
 import Ava from "~/shared/assets/icons/noAvatar.jpg";
 import clsx from "clsx";
 import { ReviewForm } from "~/widgets/ReviewPage/ui/ReviewForm";
+import type { QueryClient } from "@tanstack/react-query";
 
 interface Comment {
   id: string;
@@ -57,18 +58,63 @@ interface ReviewsProps {
   onActionSuccess?: () => void;
 }
 
+/** Обновляет одну рецензию во всех возможных ключах кеша */
+function updateReviewInCache(
+  queryClient: QueryClient,
+  reviewId: string,
+  updates: Partial<Review>,
+  userId?: string,
+  accessToken?: string,
+  status?: string
+) {
+  const queryKeys: unknown[][] = [
+    ["reviews", 0, userId],
+    ["reviews", 1, userId],
+    ["reviews", 2, userId],
+    ["reviews", 3, userId],
+    ["home-reviews", accessToken, status],
+  ];
+
+  queryKeys.forEach((queryKey) => {
+    queryClient.setQueryData(queryKey, (old: unknown) => {
+      if (!old) return old;
+      if (typeof old !== "object") return old;
+
+      const obj = old as Record<string, unknown>;
+      // Структура: { content: Review[], totalElements, ... }
+      if (Array.isArray(obj.content)) {
+        return {
+          ...old,
+          content: (obj.content as Review[]).map((r) =>
+            r.id === reviewId ? { ...r, ...updates } : r
+          ),
+        };
+      }
+      // Структура: Review[] (массив напрямую)
+      if (Array.isArray(old)) {
+        return (old as Review[]).map((r) =>
+          r.id === reviewId ? { ...r, ...updates } : r
+        );
+      }
+      return old;
+    });
+  });
+}
+
 export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const queryClient = useQueryClient();
 
   const [localIsLiked, setLocalIsLiked] = useState<boolean>(review.isLikedByCurrentUser ?? false);
   const [localLikesCount, setLocalLikesCount] = useState<number>(review.likesCount);
   const [localIsFavorited, setLocalIsFavorited] = useState<boolean>(review.isFavoritedByCurrentUser ?? false);
+  const [localCommentsCount, setLocalCommentsCount] = useState<number>(review.commentsCount);
 
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [showSpoiler, setShowSpoiler] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoadingComments, setIsLoadingComments] = useState(false);
+  const [commentsLoaded, setCommentsLoaded] = useState(false);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -79,6 +125,9 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
     setLocalIsLiked(review.isLikedByCurrentUser ?? false);
     setLocalLikesCount(review.likesCount);
     setLocalIsFavorited(review.isFavoritedByCurrentUser ?? false);
+    setLocalCommentsCount(review.commentsCount);
+    setComments([]);
+    setCommentsLoaded(false);
   }, [review]);
 
   const formattedDate = review.createdAt
@@ -116,7 +165,7 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
     mutationFn: async () => {
       const url = `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/${review.id}/like`;
       const res = await fetch(url, {
-        method: "POST", 
+        method: "POST",
         headers: {
           Authorization: `Bearer ${session?.user?.accessToken ?? ""}`,
           Accept: "application/json",
@@ -124,23 +173,53 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
         },
       });
       if (!res.ok) throw new Error("Like toggle failed");
-      return (await res.json()) as unknown;
     },
     onMutate: async () => {
+      await queryClient.cancelQueries({
+        queryKey: [
+          ["reviews", 0, session?.user?.id],
+          ["reviews", 1, session?.user?.id],
+          ["reviews", 2, session?.user?.id],
+          ["reviews", 3, session?.user?.id],
+          ["home-reviews", session?.user?.accessToken, status],
+        ].flat() as unknown as any,
+      });
+
       const wasLiked = localIsLiked;
-      setLocalIsLiked(!wasLiked);
-      setLocalLikesCount(prev => !wasLiked ? prev + 1 : (prev > 0 ? prev - 1 : 0));
-      return { wasLiked };
+      const newLiked = !wasLiked;
+      const newCount = wasLiked ? Math.max(0, localLikesCount - 1) : localLikesCount + 1;
+
+      setLocalIsLiked(newLiked);
+      setLocalLikesCount(newCount);
+
+      updateReviewInCache(
+        queryClient,
+        review.id,
+        { isLikedByCurrentUser: newLiked, likesCount: newCount },
+        session?.user?.id,
+        session?.user?.accessToken,
+        status
+      );
+
+      return { wasLiked, oldCount: localLikesCount };
     },
     onError: (_err, _variables, context) => {
-      if (context) setLocalIsLiked(context.wasLiked);
-      setLocalLikesCount(review.likesCount);
+      if (context) {
+        setLocalIsLiked(context.wasLiked);
+        setLocalLikesCount(context.oldCount);
+        updateReviewInCache(
+          queryClient,
+          review.id,
+          { isLikedByCurrentUser: context.wasLiked, likesCount: context.oldCount },
+          session?.user?.id,
+          session?.user?.accessToken,
+          status
+        );
+      }
     },
     onSettled: () => {
-      // Инвалидируем все возможные ключи рецензий
       void queryClient.invalidateQueries({ queryKey: ["reviews"] });
       void queryClient.invalidateQueries({ queryKey: ["home-reviews"] });
-      // Триггерим индикатор загрузки на главной
       onActionSuccess?.();
     },
   });
@@ -161,10 +240,40 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
       if (!res.ok) throw new Error("Favorite toggle failed");
     },
     onMutate: async (isCurrentlyFavorited) => {
+      await queryClient.cancelQueries({
+        queryKey: [
+          ["reviews", 0, session?.user?.id],
+          ["reviews", 1, session?.user?.id],
+          ["reviews", 2, session?.user?.id],
+          ["reviews", 3, session?.user?.id],
+          ["home-reviews", session?.user?.accessToken, status],
+        ].flat() as unknown as any,
+      });
+
       setLocalIsFavorited(!isCurrentlyFavorited);
+      updateReviewInCache(
+        queryClient,
+        review.id,
+        { isFavoritedByCurrentUser: !isCurrentlyFavorited },
+        session?.user?.id,
+        session?.user?.accessToken,
+        status
+      );
+
+      return { isCurrentlyFavorited };
     },
-    onError: (_err, isCurrentlyFavorited) => {
-      setLocalIsFavorited(isCurrentlyFavorited);
+    onError: (_err, isCurrentlyFavorited, context) => {
+      if (context) {
+        setLocalIsFavorited(context.isCurrentlyFavorited);
+        updateReviewInCache(
+          queryClient,
+          review.id,
+          { isFavoritedByCurrentUser: context.isCurrentlyFavorited },
+          session?.user?.id,
+          session?.user?.accessToken,
+          status
+        );
+      }
     },
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: ["reviews"] });
@@ -183,10 +292,11 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
       const res = await fetch(`/api/reviews/${review.id}/comments?page=0&size=20`, { headers });
       const data = (await res.json()) as { content?: Comment[] };
       setComments(data.content ?? []);
-    } catch (err) { 
-      console.error(err); 
-    } finally { 
-      setIsLoadingComments(false); 
+      setCommentsLoaded(true);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoadingComments(false);
     }
   }, [review.id, session]);
 
@@ -347,14 +457,21 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
           </button>
 
           <button
-            onClick={() => setIsCommentsOpen(!isCommentsOpen)}
+            onClick={() => {
+              if (!isCommentsOpen && !commentsLoaded) {
+                setIsCommentsOpen(true);
+                void fetchComments();
+              } else {
+                setIsCommentsOpen(!isCommentsOpen);
+              }
+            }}
             className={clsx(
               "bg-frostedglass flex items-center gap-1.5 rounded-xl px-3.5 py-2 transition-all hover:scale-105",
               isCommentsOpen ? "text-blue-400 bg-blue-400/10" : "text-grey hover:text-blue-400"
             )}
           >
             <MessageCircle width={17} />
-            <p className="font-medium">{review.commentsCount}</p>
+            <p className="font-medium">{localCommentsCount}</p>
           </button>
 
           <button
@@ -388,10 +505,11 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
           isLoading={isLoadingComments}
           onCommentSent={() => {
             void fetchComments();
+            setLocalCommentsCount(prev => prev + 1);
             onActionSuccess?.();
           }}
         />
       )}
     </div>
   );
-};
+}; 
