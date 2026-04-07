@@ -13,6 +13,7 @@ interface Comment {
   content: string;
   likesCount: number;
   createdAt: string;
+  parentId?: string;
   replies?: Comment[];
 }
 
@@ -21,7 +22,7 @@ interface CommentSectionProps {
   userImage: StaticImageData | string;
   comments: Comment[];
   isLoading: boolean;
-  onCommentSent: () => void;
+  onCommentSent: (newComment: Comment) => void;
 }
 
 // Вспомогательный компонент для одного комментария с логикой сворачивания
@@ -101,12 +102,12 @@ const CommentItem = ({
   );
 };
 
-export const CommentSection: React.FC<CommentSectionProps> = ({ 
-  reviewId, 
-  userImage, 
-  comments, 
-  isLoading, 
-  onCommentSent 
+export const CommentSection: React.FC<CommentSectionProps> = ({
+  reviewId,
+  userImage,
+  comments,
+  isLoading,
+  onCommentSent
 }) => {
   const { data: session } = useSession();
   const [text, setText] = useState("");
@@ -117,6 +118,17 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   const handleSend = async () => {
     if (!text.trim() || isSending) return;
     setIsSending(true);
+    
+    // Создаём оптимистичный комментарий для немедленного отображения
+    const optimisticComment: Comment = {
+      id: `temp-${Date.now()}`,
+      userName: session?.user?.name ?? "Вы",
+      content: text.trim(),
+      likesCount: 0,
+      createdAt: new Date().toISOString(),
+      replies: []
+    };
+    
     try {
       const res = await fetch(`/api/reviews/${reviewId}/comments`, {
         method: "POST",
@@ -125,16 +137,21 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
           "Accept": "*/*",
           ...(session?.user?.accessToken && { "Authorization": `Bearer ${session.user.accessToken}` }),
         },
-        body: JSON.stringify({ 
-          content: text, 
-          parentId: replyTo ? replyTo.id : null 
+        body: JSON.stringify({
+          content: text,
+          parentId: replyTo ? replyTo.id : null
         }),
       });
 
       if (res.ok) {
         setText("");
         setReplyTo(null);
-        onCommentSent();
+        // Передаём новый комментарий в родительский компонент для оптимистичного обновления
+        onCommentSent({
+          ...optimisticComment,
+          // Для ответов важно указать parentId для правильной вложенности
+          ...(replyTo && { parentId: replyTo.id })
+        });
       }
     } catch (error) {
       console.error(error);
