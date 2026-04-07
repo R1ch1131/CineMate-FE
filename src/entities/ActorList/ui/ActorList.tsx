@@ -27,14 +27,14 @@ export const ActorsList = ({ movie }: ActorProps) => {
           key={actor.tmdbId}
           className="flex flex-col items-center gap-3 hover:-translate-y-1.5 transition-transform duration-300"
         >
-          <div className="relative w-50 h-50 rounded-2xl overflow-hidden shadow-lg">
+          <div className="relative w-50 h-60 rounded-2xl overflow-hidden shadow-lg">
             <Image
               src={actor.profileUrl!}
               alt={actor.name}
               fill
-              className="object-cover hover:scale-105 transition-transform duration-300"
-              sizes="(max-width: 768px) 160px, (max-width: 1024px) 192px, 224px"
-              unoptimized 
+              className="object-cover object-top hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 768px) 120px, (max-width: 1024px) 140px, 160px"
+              unoptimized
             />
           </div>
           <div className="flex flex-col items-center text-center px-2">

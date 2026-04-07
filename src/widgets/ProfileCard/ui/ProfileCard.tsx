@@ -11,6 +11,7 @@ import { ProfileLikeTab } from "~/features/TABS/ProfileLikeTab";
 import { ProfileReviewsTab } from "~/features/TABS/ProfileReviewsTab";
 import { ProfileSettingTab } from "~/features/TABS/ProfileSettingTab";
 import { ProfileViewTab } from "~/features/TABS/ProfileViewTab";
+import { useProfileStats } from "~/shared/hooks/useProfileStats";
 import noAvatar from "~/shared/assets/icons/noAvatar.jpg";
 
 interface UserProfile {
@@ -30,6 +31,8 @@ export const ProfileCard = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState(0);
+
+  const { data: stats, isLoading: statsLoading } = useProfileStats();
 
   const fetchProfile = useCallback(async () => {
     if (!token) return;
@@ -113,9 +116,31 @@ export const ProfileCard = () => {
             <p>enthusiast</p>
           </div>
           <div className="flex-1 gap-3 grid grid-cols-4">
-            <ProfileStats icon={BookOpen} iconColor={"text-blue-500"} count={"32"} text={"Рецензий"} />
+            <ProfileStats
+              icon={BookOpen}
+              iconColor={"text-blue-500"}
+              count={
+                statsLoading ? (
+                  <span className="inline-block animate-pulse">•••</span>
+                ) : (
+                  String(stats?.totalReviews ?? 0)
+                )
+              }
+              text={"Рецензий"}
+            />
             <ProfileStats icon={Film} iconColor={"text-purple-500"} count={"213"} text={"Фильмов"} />
-            <ProfileStats icon={Heart} iconColor={"text-red-500"} count={"342"} text={"Лайков"} />
+            <ProfileStats
+              icon={Heart}
+              iconColor={"text-red-500"}
+              count={
+                statsLoading ? (
+                  <span className="inline-block animate-pulse">•••</span>
+                ) : (
+                  String(stats?.totalLikes ?? 0)
+                )
+              }
+              text={"Лайков"}
+            />
             <ProfileStats icon={Users} iconColor={"text-green-500"} count={"1321"} text={"Подписчиков"} />
           </div>
         </div>
