@@ -33,11 +33,20 @@ interface ReviewInitialData {
 }
 
 interface ReviewFormProps {
-  initialData?: ReviewInitialData; // Заменили any на интерфейс
+  initialData?: ReviewInitialData;
   isEdit?: boolean;
   onSuccess?: () => void;
   trigger?: ReactNode;
 }
+
+const REVIEW_TEMPLATE = 
+`Визуальный стиль и эффекты
+
+
+Актерская игра
+
+
+Сценарий и сюжет`;
 
 export const ReviewForm = ({ initialData, isEdit = false, onSuccess, trigger }: ReviewFormProps) => {
   const { data: session } = useSession();
@@ -48,7 +57,7 @@ export const ReviewForm = ({ initialData, isEdit = false, onSuccess, trigger }: 
   const [enabled, setEnabled] = useState(false);
   const [rating, setRating] = useState(0);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
-  
+
   const maxChars = 1000;
 
   useEffect(() => {
@@ -85,7 +94,7 @@ export const ReviewForm = ({ initialData, isEdit = false, onSuccess, trigger }: 
         { signal }
       );
       if (!response.ok) throw new Error("Ошибка поиска");
-      
+
       // Явная типизация ответа
       const data = (await response.json()) as Movie[];
       setSearchResults(Array.isArray(data) ? data : []);
@@ -101,10 +110,10 @@ export const ReviewForm = ({ initialData, isEdit = false, onSuccess, trigger }: 
 
   useEffect(() => {
     if (isEdit || searchQuery.length < 2) return;
-    
+
     const controller = new AbortController();
     const timer = setTimeout(() => {
-      // Чтобы избежать "floating promise", просто вызываем функцию. 
+      // Чтобы избежать "floating promise", просто вызываем функцию.
       // Линтер может просить void, если функция внутри useEffect возвращает Promise.
       void searchMovies(searchQuery, controller.signal);
     }, 600);
@@ -136,33 +145,47 @@ export const ReviewForm = ({ initialData, isEdit = false, onSuccess, trigger }: 
     setIsSubmitting(true);
 
     try {
-      const url = isEdit && initialData ? `/reviews/${initialData.id}` : '/reviews';
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? '';
+      const url = isEdit && initialData ? `${baseUrl}/reviews/${initialData.id}` : `${baseUrl}/reviews`;
       const method = isEdit ? 'PUT' : 'POST';
 
-      const response = await fetch(url, {
-        method: method,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.user?.accessToken}`
-        },
-        body: JSON.stringify({
+      const releaseDate = selectedMovie.releaseDate
+        ? (selectedMovie.releaseDate.includes('T') 
+            ? selectedMovie.releaseDate 
+            : `${selectedMovie.releaseDate}T00:00:00`)
+        : null;
+
+      const body = JSON.stringify({
           movieId: selectedMovie.tmdbId,
           movieTitle: selectedMovie.title,
           moviePosterPath: selectedMovie.posterUrl,
-          movieReleaseDate: selectedMovie.releaseDate,
+          movieReleaseDate: releaseDate,
           content: reviewText,
           rating: rating,
           isSpoiler: enabled
-        }),
+        });
+
+      console.log('URL:', url);
+      console.log('Body:', body);
+
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.user?.accessToken}`
+        },
+        body: body,
       });
 
-      if (response.ok) {
-        if (onSuccess) onSuccess(); 
-        handleClosePopup();
-      } else {
+      if (!response.ok) {
         const errorText = await response.text();
+        console.error('Server error:', response.status, errorText);
         alert(`Ошибка: ${errorText}`);
+        return;
       }
+
+      if (onSuccess) onSuccess();
+      handleClosePopup();
     } catch (error) {
       console.error("Ошибка при отправке формы:", error);
       alert("Произошла ошибка при сохранении.");
@@ -175,7 +198,7 @@ export const ReviewForm = ({ initialData, isEdit = false, onSuccess, trigger }: 
     <>
       <div onClick={() => setIsPopupOpen(true)} className="w-full">
         {trigger ?? (
-  <div className="from-lightorange to-darkorange flex h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r text-white shadow-lg hover:opacity-90 transition-opacity">
+  <div className="from-lightorange to-darkorange flex h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-linear-to-r text-white shadow-lg hover:opacity-90 transition-opacity">
     <Plus className="h-5 w-5" />
     <p className="font-medium">Написать рецензию</p>
   </div>
@@ -184,10 +207,10 @@ export const ReviewForm = ({ initialData, isEdit = false, onSuccess, trigger }: 
 
       {isPopupOpen && (
         <Popup isOpen={isPopupOpen} onClose={handleClosePopup}>
-          <div className="w-[95vw] sm:w-[600px] max-h-[95vh] overflow-y-auto bg-[#0a0a0a] rounded-2xl flex flex-col scrollbar-hide border border-white/5 shadow-2xl text-left">
+          <div className="w-[95vw] sm:w-150 max-h-[95vh] overflow-y-auto rounded-2xl flex flex-col scrollbar-hide border border-white/5 shadow-2xl text-left">
             
-            <div className="flex h-20 w-full shrink-0 items-center gap-4 rounded-t-2xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 pl-6 border-b border-white/5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 shadow-orange-500/20 shadow-lg">
+            <div className="flex h-20 w-full shrink-0 items-center gap-4 rounded-t-2xl bg-orange-500/15 pl-6 border-b border-white/5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-linear-to-r from-amber-500 to-orange-600 shadow-orange-500/20 shadow-lg">
                 {isEdit ? <Pencil className="h-5 w-5 text-white" /> : <Film className="h-5 w-5 text-white" />}
               </div>
               <div>
@@ -215,9 +238,9 @@ export const ReviewForm = ({ initialData, isEdit = false, onSuccess, trigger }: 
                     {searchQuery.length >= 2 && searchResults.length > 0 && (
                       <div className="absolute z-50 mt-2 w-full rounded-xl bg-[#1a1a1a] border border-white/10 shadow-2xl overflow-hidden">
                         {searchResults.map((movie) => (
-                          <div 
-                            key={movie.tmdbId} 
-                            onClick={() => { setSelectedMovie(movie); setSearchQuery(""); }} 
+                          <div
+                            key={movie.tmdbId}
+                            onClick={() => { setSelectedMovie(movie); setSearchQuery(""); }}
                             className="flex items-center gap-4 p-3 hover:bg-white/5 cursor-pointer border-b border-white/5 last:border-none"
                           >
                             <div className="relative w-10 h-14 shrink-0">
@@ -255,11 +278,22 @@ export const ReviewForm = ({ initialData, isEdit = false, onSuccess, trigger }: 
               </div>
               
               <div className="space-y-3">
-                <p className="text-sm font-semibold uppercase tracking-wider text-gray-500">Ваша рецензия</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold uppercase tracking-wider text-gray-500">Ваша рецензия</p>
+                  {!isEdit && (
+                    <button
+                      type="button"
+                      onClick={() => setReviewText(REVIEW_TEMPLATE)}
+                      className="text-[11px] font-bold uppercase text-amber-500 hover:text-amber-400 transition-colors"
+                    >
+                      Шаблон
+                    </button>
+                  )}
+                </div>
                 <Textarea
                   value={reviewText}
                   onChange={(e) => setReviewText(e.target.value)}
-                  placeholder="Опишите свои впечатления..."
+                  placeholder="Опишите свои впечатления или нажмите «Шаблон»..."
                   className="bg-white/5 block w-full resize-none rounded-xl border-none px-4 py-3 text-sm text-white focus:ring-2 focus:ring-amber-600 min-h-[140px] outline-none"
                 />
                 <div className="flex justify-between text-[11px] font-bold uppercase text-gray-500">

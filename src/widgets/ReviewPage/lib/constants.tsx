@@ -5,7 +5,7 @@ export const REVIEW_TABS = [
     name: "Все рецензии",
     icon: <Eye size={18} />,
     id: "all",
-    endpoint: "/reviews",
+    endpoint: "/reviews/all",
   },
  {
     name: "Избранные",

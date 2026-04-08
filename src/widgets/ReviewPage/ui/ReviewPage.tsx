@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { useQuery, useQueryClient } from "@tanstack/react-query"; 
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { HotDebate } from "./HotDebate";
 import { SearchBar } from "./SearchBar";
 import { ReviewForm } from "./ReviewForm";
 import { ReviewCols } from "./ReviewCols";
-import type { Review } from "./ReviewCols"; 
+import type { Review } from "./ReviewCols";
 import { REVIEW_TABS } from "../lib/constants";
 
 
@@ -23,23 +23,52 @@ interface ReviewsResponse {
 export const ReviewPage = () => {
   const { data: session, status } = useSession();
   const [activeTab, setActiveTab] = useState(0);
-  const queryClient = useQueryClient(); 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [sortBy, setSortBy] = useState("createdAt,desc");
+  const queryClient = useQueryClient();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Debounce поиска
+  useEffect(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 500);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [searchQuery]);
 
   // Получаем текущий таб безопасно
   const currentTab = REVIEW_TABS[activeTab] ?? REVIEW_TABS[0];
 
   const { data, isLoading, isFetching } = useQuery<ReviewsResponse>({
-    queryKey: ["reviews", activeTab, session?.user?.id],
+    queryKey: ["reviews", activeTab, session?.user?.id, debouncedQuery, sortBy],
     queryFn: async () => {
-      const tab = REVIEW_TABS[activeTab];
-      if (!tab) throw new Error("Таб не найден");
+      let url: string;
 
-      let url = `${tab.endpoint}?page=0&size=20`;
-      
-      if (tab.id === "my" && session?.user?.id) {
-        url = `${process.env.NEXT_PUBLIC_API_URL}/reviews/user/${session.user.id}?page=0&size=20`;
+      // Если есть поисковый запрос — используем соответствующий эндпоинт
+      if (debouncedQuery.trim()) {
+        const isUserSearch = debouncedQuery.startsWith('@');
+        const query = isUserSearch ? debouncedQuery.slice(1) : debouncedQuery;
+        
+        if (isUserSearch) {
+          // Поиск по username
+          url = `${process.env.NEXT_PUBLIC_API_URL}/reviews/search/user?username=${encodeURIComponent(query.trim())}&page=0&size=20&sort=${sortBy}`;
+        } else {
+          // Поиск по названию фильма
+          url = `${process.env.NEXT_PUBLIC_API_URL}/reviews/search/movie?title=${encodeURIComponent(query.trim())}&page=0&size=20&sort=${sortBy}`;
+        }
       } else {
-        url = `${process.env.NEXT_PUBLIC_API_URL}${tab.endpoint}?page=0&size=20`;
+        const tab = REVIEW_TABS[activeTab];
+        if (!tab) throw new Error("Таб не найден");
+
+        if (tab.id === "my" && session?.user?.id) {
+          url = `${process.env.NEXT_PUBLIC_API_URL}/reviews/user/${session.user.id}?page=0&size=20&sort=${sortBy}`;
+        } else {
+          url = `${process.env.NEXT_PUBLIC_API_URL}${tab.endpoint}?page=0&size=20&sort=${sortBy}`;
+        }
       }
 
       const response = await fetch(url, {
@@ -52,7 +81,7 @@ export const ReviewPage = () => {
       });
 
       if (!response.ok) throw new Error("Ошибка загрузки");
-      
+
       return (await response.json()) as ReviewsResponse;
     },
     enabled: status !== "loading",
@@ -61,7 +90,14 @@ export const ReviewPage = () => {
 
   const handleRefresh = async () => {
   try {
-    await queryClient.invalidateQueries({ queryKey: ["reviews"] });
+    await queryClient.invalidateQueries({
+      queryKey: ["reviews"],
+      refetchType: "active"
+    });
+    await queryClient.refetchQueries({
+      queryKey: ["reviews", activeTab, session?.user?.id, debouncedQuery, sortBy],
+      type: "active"
+    });
     console.log("Данные успешно обновлены");
   } catch (error) {
     console.error("Ошибка при обновлении:", error);
@@ -70,6 +106,20 @@ export const ReviewPage = () => {
 
   const reviews = data?.content ?? [];
   const totalElements = data?.totalElements ?? 0;
+
+  // Клиентская сортировка (если сервер не поддерживает sort)
+  const sortedReviews = [...reviews].sort((a, b) => {
+    if (sortBy === "createdAt,desc") {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+    if (sortBy === "likesCount,desc") {
+      return (b.likesCount ?? 0) - (a.likesCount ?? 0);
+    }
+    if (sortBy === "rating,desc") {
+      return (b.rating ?? 0) - (a.rating ?? 0);
+    }
+    return 0;
+  });
 
   return (
     <div className="min-h-screen">
@@ -99,7 +149,7 @@ export const ReviewPage = () => {
           </div>
 
           <div className="w-full md:w-8/12">
-            <SearchBar reviewsCount={totalElements} tabName={currentTab.name} />
+            <SearchBar reviewsCount={totalElements} tabName={currentTab.name} searchQuery={searchQuery} onSearchChange={setSearchQuery} sortBy={sortBy} onSortChange={setSortBy} />
             
             <div className="mt-6 min-h-125 relative">
               {isFetching && !isLoading && (
@@ -114,7 +164,7 @@ export const ReviewPage = () => {
                   <Loader2 className="animate-spin text-lightorange" size={40} />
                 </div>
               ) : (
-                <ReviewCols reviews={reviews} onActionSuccess={handleRefresh} />
+                <ReviewCols reviews={sortedReviews} onActionSuccess={handleRefresh} />
               )}
             </div>
           </div>
