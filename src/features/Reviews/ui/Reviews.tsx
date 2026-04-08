@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -22,7 +22,8 @@ import { CommentSection } from "./CommentSection";
 import Ava from "~/shared/assets/icons/noAvatar.jpg";
 import clsx from "clsx";
 import { ReviewForm } from "~/widgets/ReviewPage/ui/ReviewForm";
-import type { QueryClient } from "@tanstack/react-query";
+
+
 
 interface Comment {
   id: string;
@@ -59,52 +60,15 @@ interface ReviewsProps {
   onActionSuccess?: () => void;
 }
 
-/** Обновляет одну рецензию во всех возможных ключах кеша */
-function updateReviewInCache(
-  queryClient: QueryClient,
-  reviewId: string,
-  updates: Partial<Review>,
-  userId?: string,
-  accessToken?: string,
-  status?: string
-) {
-  const queryKeys: unknown[][] = [
-    ["reviews", 0, userId],
-    ["reviews", 1, userId],
-    ["reviews", 2, userId],
-    ["reviews", 3, userId],
-    ["home-reviews", accessToken, status],
-  ];
 
-  queryKeys.forEach((queryKey) => {
-    queryClient.setQueryData(queryKey, (old: unknown) => {
-      if (!old) return old;
-      if (typeof old !== "object") return old;
-
-      const obj = old as Record<string, unknown>;
-      // Структура: { content: Review[], totalElements, ... }
-      if (Array.isArray(obj.content)) {
-        return {
-          ...old,
-          content: (obj.content as Review[]).map((r) =>
-            r.id === reviewId ? { ...r, ...updates } : r
-          ),
-        };
-      }
-      // Структура: Review[] (массив напрямую)
-      if (Array.isArray(old)) {
-        return (old as Review[]).map((r) =>
-          r.id === reviewId ? { ...r, ...updates } : r
-        );
-      }
-      return old;
-    });
-  });
-}
 
 export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const queryClient = useQueryClient();
+
+  const user = session?.user as { id: string; accessToken?: string } | undefined;
+  const userId = user?.id;
+  const accessToken = user?.accessToken;
 
   const [localIsLiked, setLocalIsLiked] = useState<boolean>(review.isLikedByCurrentUser ?? false);
   const [localLikesCount, setLocalLikesCount] = useState<number>(review.likesCount);
@@ -119,8 +83,11 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isContentExpanded, setIsContentExpanded] = useState(false);
+  const [isContentOverflow, setIsContentOverflow] = useState(false);
+  const contentRef = useRef<HTMLParagraphElement>(null);
 
-  const isAuthor = session?.user?.id === review.userId;
+  const isAuthor = userId === review.userId;
 
   useEffect(() => {
     setLocalIsLiked(review.isLikedByCurrentUser ?? false);
@@ -129,7 +96,24 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
     setLocalCommentsCount(review.commentsCount);
     setComments([]);
     setCommentsLoaded(false);
+    setIsContentExpanded(false);
+    setIsContentOverflow(false);
   }, [review]);
+
+  // Проверяем, превышает ли контент 4 строки
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const lineHeight = parseFloat(getComputedStyle(el).lineHeight);
+        const isOverflow = entry.contentRect.height > lineHeight * 4;
+        setIsContentOverflow(isOverflow);
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [review.content, isContentExpanded]);
 
   const formattedDate = review.createdAt
     ? new Date(review.createdAt).toLocaleDateString("ru-RU")
@@ -144,7 +128,7 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
       const res = await fetch(url, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${session?.user?.accessToken ?? ""}`,
+          Authorization: `Bearer ${accessToken ?? ""}`,
           Accept: "application/json",
           "Content-Type": "application/json",
         },
@@ -168,54 +152,25 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
       const res = await fetch(url, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${session?.user?.accessToken ?? ""}`,
+          Authorization: `Bearer ${accessToken ?? ""}`,
           Accept: "application/json",
           "Content-Type": "application/json",
         },
       });
       if (!res.ok) throw new Error("Like toggle failed");
     },
-    onMutate: async () => {
-      await queryClient.cancelQueries({
-        queryKey: [
-          ["reviews", 0, session?.user?.id],
-          ["reviews", 1, session?.user?.id],
-          ["reviews", 2, session?.user?.id],
-          ["reviews", 3, session?.user?.id],
-          ["home-reviews", session?.user?.accessToken, status],
-        ].flat() as unknown as any,
-      });
-
+    onMutate: () => {
       const wasLiked = localIsLiked;
       const newLiked = !wasLiked;
       const newCount = wasLiked ? Math.max(0, localLikesCount - 1) : localLikesCount + 1;
-
       setLocalIsLiked(newLiked);
       setLocalLikesCount(newCount);
-
-      updateReviewInCache(
-        queryClient,
-        review.id,
-        { isLikedByCurrentUser: newLiked, likesCount: newCount },
-        session?.user?.id,
-        session?.user?.accessToken,
-        status
-      );
-
       return { wasLiked, oldCount: localLikesCount };
     },
     onError: (_err, _variables, context) => {
       if (context) {
         setLocalIsLiked(context.wasLiked);
         setLocalLikesCount(context.oldCount);
-        updateReviewInCache(
-          queryClient,
-          review.id,
-          { isLikedByCurrentUser: context.wasLiked, likesCount: context.oldCount },
-          session?.user?.id,
-          session?.user?.accessToken,
-          status
-        );
       }
     },
     onSettled: () => {
@@ -233,47 +188,20 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
       const res = await fetch(url, {
         method: method,
         headers: {
-          Authorization: `Bearer ${session?.user?.accessToken ?? ""}`,
+          Authorization: `Bearer ${accessToken ?? ""}`,
           Accept: "application/json",
           "Content-Type": "application/json",
         },
       });
       if (!res.ok) throw new Error("Favorite toggle failed");
     },
-    onMutate: async (isCurrentlyFavorited) => {
-      await queryClient.cancelQueries({
-        queryKey: [
-          ["reviews", 0, session?.user?.id],
-          ["reviews", 1, session?.user?.id],
-          ["reviews", 2, session?.user?.id],
-          ["reviews", 3, session?.user?.id],
-          ["home-reviews", session?.user?.accessToken, status],
-        ].flat() as unknown as any,
-      });
-
+    onMutate: (isCurrentlyFavorited) => {
       setLocalIsFavorited(!isCurrentlyFavorited);
-      updateReviewInCache(
-        queryClient,
-        review.id,
-        { isFavoritedByCurrentUser: !isCurrentlyFavorited },
-        session?.user?.id,
-        session?.user?.accessToken,
-        status
-      );
-
       return { isCurrentlyFavorited };
     },
     onError: (_err, isCurrentlyFavorited, context) => {
       if (context) {
         setLocalIsFavorited(context.isCurrentlyFavorited);
-        updateReviewInCache(
-          queryClient,
-          review.id,
-          { isFavoritedByCurrentUser: context.isCurrentlyFavorited },
-          session?.user?.id,
-          session?.user?.accessToken,
-          status
-        );
       }
     },
     onSettled: () => {
@@ -287,8 +215,8 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
     setIsLoadingComments(true);
     try {
       const headers: HeadersInit = { Accept: "*/*" };
-      if (session?.user?.accessToken) {
-        headers.Authorization = `Bearer ${session.user.accessToken}`;
+      if (accessToken) {
+        headers.Authorization = `Bearer ${accessToken}`;
       }
       const res = await fetch(`/api/reviews/${review.id}/comments?page=0&size=20`, { headers });
       const data = (await res.json()) as { content?: Comment[] };
@@ -299,7 +227,7 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
     } finally {
       setIsLoadingComments(false);
     }
-  }, [review.id, session]);
+  }, [review.id, accessToken]);
 
   return (
     <div className="bg-glass border-frostedglass rounded-2xl border p-6 transition-all hover:border-white/10 relative overflow-visible">
@@ -333,7 +261,7 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
                 <Image className="object-cover" src={review.userImage ?? Ava} alt="avatar" fill unoptimized />
               </div>
               <Link href={"/profile"}>
-                <p className="hover:text-lightorange text-white transition-colors cursor-pointer truncate max-w-[150px]">
+                <p className="hover:text-lightorange text-white transition-colors cursor-pointer truncate max-w-37.5">
                   {review.userName}
                 </p>
               </Link>
@@ -437,7 +365,44 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
             </div>
           </div>
         ) : (
-          <p className="text-gray-300 p-4 leading-relaxed wrap-break-word whitespace-pre-wrap">{review.content}</p>
+          <div className="relative">
+            <div
+              className={clsx(
+                "relative overflow-hidden",
+                !isContentExpanded && "max-h-[9.6em]"
+              )}
+            >
+              <p
+                ref={contentRef}
+                className="text-gray-300 p-4 leading-relaxed wrap-break-word whitespace-pre-wrap"
+              >
+                {review.content}
+              </p>
+              {!isContentExpanded && isContentOverflow && (
+                <div className="absolute bottom-0 left-0 right-0 h-16  pointer-events-none" />
+              )}
+            </div>
+            {!isContentExpanded && isContentOverflow && (
+              <div className="absolute bottom-0 right-0 px-4 py-2 rounded-bl-xl">
+                <button
+                  onClick={() => setIsContentExpanded(true)}
+                  className="text-[11px] font-bold uppercase text-amber-500 hover:text-amber-400 transition-colors whitespace-nowrap"
+                >
+                  Показать полностью
+                </button>
+              </div>
+            )}
+            {isContentExpanded && (
+              <div className="px-4 pb-2 flex justify-end">
+                <button
+                  onClick={() => setIsContentExpanded(false)}
+                  className="text-[11px] font-bold uppercase text-amber-500 hover:text-amber-400 transition-colors whitespace-nowrap"
+                >
+                  Свернуть
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
@@ -511,7 +476,7 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
               setComments(prev => 
                 prev.map(comment => 
                   comment.id === newComment.parentId
-                    ? { ...comment, replies: [newComment, ...(comment.replies || [])] }
+                    ? { ...comment, replies: [newComment, ...(comment.replies ?? [])] }
                     : comment
                 )
               );

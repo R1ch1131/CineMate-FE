@@ -44,7 +44,7 @@ const fetchReviews = async (token?: string): Promise<Review[]> => {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews?page=0&size=4`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews/all?page=0&size=4`, {
     headers
   });
 
