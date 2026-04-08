@@ -11,13 +11,13 @@ interface ProfileData {
 }
 
 interface LoginResponse {
-  accessToken: string;
+  token: string;
   refreshToken: string;
   error?: string;
 }
 
 interface RefreshResponse {
-  accessToken: string;
+  token: string;
   refreshToken?: string;
   error?: string;
 }
@@ -70,8 +70,10 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
 
     return {
       ...token,
+      // Бэк всегда присылает новый refreshToken при ротации
       refreshToken: data.refreshToken ?? token.refreshToken,
-      accessToken: data.accessToken,
+      accessToken: data.token,
+      // Фиксированная длительность 1 час (бэк не присылает expiresIn)
       accessTokenExpires: Date.now() + 60 * 60 * 1000,
       error: undefined,
     };
@@ -105,12 +107,11 @@ export const authOptions: AuthOptions = {
           const loginData = (await loginRes.json()) as LoginResponse;
           if (!loginRes.ok) throw new Error(loginData.error ?? "Login failed");
 
-          const accessToken = loginData.accessToken;
-          const refreshToken = loginData.refreshToken;
+          const token = loginData.token;
 
           const profileRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile/me`, {
             headers: {
-              "Authorization": `Bearer ${accessToken}`,
+              "Authorization": `Bearer ${token}`,
               "Accept": "application/json",
             },
           });
@@ -132,8 +133,9 @@ export const authOptions: AuthOptions = {
             id: userId,
             name: profileData?.username ?? credentials.email.split('@')[0],
             email: credentials.email,
-            accessToken: accessToken,
-            refreshToken: refreshToken,
+            accessToken: token,
+            refreshToken: loginData.refreshToken,
+            // Бэк не присылает время жизни — фиксированная длительность 1 час
             accessTokenExpires: Date.now() + 60 * 60 * 1000,
             bio: profileData?.bio,
             createdAt: profileData?.createdAt
@@ -147,6 +149,7 @@ export const authOptions: AuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user, trigger, session }) {
+      // 1. ПЕРВИЧНЫЙ ВХОД
       if (user) {
         return {
           ...token,
@@ -161,27 +164,38 @@ export const authOptions: AuthOptions = {
         };
       }
 
+      // 2. ОБНОВЛЕНИЕ ПРОФИЛЯ
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (trigger === "update" && session?.user) {
         return {
           ...token,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           name: session.user.name,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           email: session.user.email ?? token.email,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           bio: session.user.bio ?? token.bio,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           createdAt: session.user.createdAt ?? token.createdAt,
         };
       }
 
+      // 3. ПРОВЕРКА ВРЕМЕНИ ЖИЗНИ
+      // Если до конца жизни токена больше 10 секунд, просто возвращаем текущий
       if (!token.accessTokenExpires || Date.now() < token.accessTokenExpires - 10000) {
+        // Если была ошибка рефреша — всё ещё помечаем
         if (token.error === "RefreshAccessTokenError") {
           return { ...token };
         }
         return token;
       }
 
+      // 4. ТОКЕН ИСТЕК — ЗАПУСКАЕМ РЕФРЕШ
       return await refreshAccessToken(token);
     },
 
     async session({ session, token }) {
+      // Если при рефреше произошла ошибка — разлогиниваем
       if (token.error === "RefreshAccessTokenError") {
         return {
           ...session,
