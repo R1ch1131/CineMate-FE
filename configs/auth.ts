@@ -2,26 +2,6 @@ import type { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { JWT } from "next-auth/jwt";
 
-interface ProfileData {
-  id: string;
-  username?: string;
-  email?: string;
-  bio?: string;
-  createdAt?: string;
-}
-
-interface LoginResponse {
-  token: string;
-  refreshToken: string;
-  error?: string;
-}
-
-interface RefreshResponse {
-  token: string;
-  refreshToken?: string;
-  error?: string;
-}
-
 declare module "next-auth" {
   interface User {
     id: string;
@@ -45,9 +25,9 @@ declare module "next-auth/jwt" {
     accessToken: string;
     refreshToken: string;
     accessTokenExpires: number;
-    name?: string | null;
-    email?: string | null;
-    bio?: string;
+    name?: string;
+    email?: string;
+    bio?: string;     
     createdAt?: string;
     error?: string;
   }
@@ -55,30 +35,24 @@ declare module "next-auth/jwt" {
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken: token.refreshToken }),
     });
 
-    const data = (await response.json()) as RefreshResponse;
+    const data = await response.json();
 
-    if (!response.ok) {
-      console.error("[NEXT-AUTH] Refresh token failed", data);
-      throw new Error(data.error ?? "RefreshAccessTokenError");
-    }
+    if (!response.ok) throw data;
 
     return {
       ...token,
-      // Бэк всегда присылает новый refreshToken при ротации
+      accessToken: data.token, 
       refreshToken: data.refreshToken ?? token.refreshToken,
-      accessToken: data.token,
-      // Фиксированная длительность 1 час (бэк не присылает expiresIn)
-      accessTokenExpires: Date.now() + 60 * 60 * 1000,
+      accessTokenExpires: Date.now() + 60 * 60 * 1000, 
       error: undefined,
     };
   } catch (error) {
-    console.error("[NEXT-AUTH] Refresh Error:", error);
     return {
       ...token,
       error: "RefreshAccessTokenError",
@@ -98,50 +72,35 @@ export const authOptions: AuthOptions = {
         if (!credentials?.email || !credentials?.password) return null;
 
         try {
-          const loginRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/sign-in`, {
+          const loginRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/sign-in`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(credentials),
           });
 
-          const loginData = (await loginRes.json()) as LoginResponse;
-          if (!loginRes.ok) throw new Error(loginData.error ?? "Login failed");
+          const loginData = await loginRes.json();
+          if (!loginRes.ok) return null;
 
           const token = loginData.token;
 
-          const profileRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile/me`, {
-            headers: {
-              "Authorization": `Bearer ${token}`,
-              "Accept": "application/json",
-            },
+          const profileRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/profile/me`, {
+            headers: { "Authorization": `Bearer ${token}` },
           });
 
-          let userId = "";
-          let profileData: ProfileData | null = null;
-
-          if (profileRes.ok) {
-            profileData = await profileRes.json() as ProfileData;
-            userId = profileData?.id ?? "";
-          }
-
-          if (!userId) {
-            console.error("[NEXT-AUTH] UUID not found via /me");
-            return null;
-          }
+          if (!profileRes.ok) return null;
+          const profileData = await profileRes.json();
 
           return {
-            id: userId,
-            name: profileData?.username ?? credentials.email.split('@')[0],
+            id: profileData.id,
+            name: profileData.username || credentials.email.split('@')[0],
             email: credentials.email,
-            accessToken: token,
+            accessToken: token, 
             refreshToken: loginData.refreshToken,
-            // Бэк не присылает время жизни — фиксированная длительность 1 час
-            accessTokenExpires: Date.now() + 60 * 60 * 1000,
-            bio: profileData?.bio,
-            createdAt: profileData?.createdAt
+            accessTokenExpires: Date.now() + 60 * 60 * 1000, 
+            bio: profileData.bio,
+            createdAt: profileData.createdAt
           };
         } catch (error) {
-          console.error("[NEXT-AUTH] Authorize error:", error);
           return null;
         }
       },
@@ -149,7 +108,6 @@ export const authOptions: AuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user, trigger, session }) {
-      // 1. ПЕРВИЧНЫЙ ВХОД
       if (user) {
         return {
           ...token,
@@ -164,57 +122,41 @@ export const authOptions: AuthOptions = {
         };
       }
 
-      // 2. ОБНОВЛЕНИЕ ПРОФИЛЯ
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (trigger === "update" && session?.user) {
-        return {
-          ...token,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          name: session.user.name,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          email: session.user.email ?? token.email,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          bio: session.user.bio ?? token.bio,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          createdAt: session.user.createdAt ?? token.createdAt,
-        };
+        return { ...token, ...session.user };
       }
 
-      // 3. ПРОВЕРКА ВРЕМЕНИ ЖИЗНИ
-      // Если до конца жизни токена больше 10 секунд, просто возвращаем текущий
-      if (!token.accessTokenExpires || Date.now() < token.accessTokenExpires - 10000) {
-        // Если была ошибка рефреша — всё ещё помечаем
-        if (token.error === "RefreshAccessTokenError") {
-          return { ...token };
-        }
+      if (Date.now() < (token.accessTokenExpires as number) - 10000) {
         return token;
       }
 
-      // 4. ТОКЕН ИСТЕК — ЗАПУСКАЕМ РЕФРЕШ
       return await refreshAccessToken(token);
     },
 
     async session({ session, token }) {
-      // Если при рефреше произошла ошибка — разлогиниваем
-      if (token.error === "RefreshAccessTokenError") {
-        return {
-          ...session,
-          error: "RefreshAccessTokenError",
-          user: null!,
-        };
-      }
-
       if (session.user) {
-        session.user.id = token.id;
-        session.user.accessToken = token.accessToken;
-        session.user.refreshToken = token.refreshToken;
-        session.user.name = token.name ?? undefined;
-        session.user.email = token.email ?? "";
-        session.user.bio = token.bio;
-        session.user.createdAt = token.createdAt;
-        session.user.accessTokenExpires = token.accessTokenExpires;
+        session.user.id = token.id as string;
+        session.user.accessToken = token.accessToken as string;
+        session.user.refreshToken = token.refreshToken as string;
+        session.user.name = token.name;
+        session.user.email = token.email as string;
+        session.user.bio = token.bio as string;
+        session.user.createdAt = token.createdAt as string;
+        session.user.accessTokenExpires = token.accessTokenExpires as number;
+        session.error = token.error as string;
       }
       return session;
+    },
+  },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: false,
+      },
     },
   },
   session: { strategy: "jwt" },
