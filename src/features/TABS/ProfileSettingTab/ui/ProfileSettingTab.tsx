@@ -8,7 +8,8 @@ import noAvatar from "~/shared/assets/icons/noAvatar.jpg";
 import { useSession, signOut } from 'next-auth/react';
 
 interface ProfileSettingTabProps {
-  onUpdate?: () => void;
+  currentAvatarUrl?: string | null;
+  onUpdate?: (avatarUrl?: string) => void;
 }
 
 interface FormState {
@@ -18,31 +19,33 @@ interface FormState {
   createdAt: string; 
 }
 
-export const ProfileSettingTab = ({ onUpdate }: ProfileSettingTabProps) => {
+export const ProfileSettingTab = ({ currentAvatarUrl: externalAvatarUrl, onUpdate }: ProfileSettingTabProps) => {
   const { data: session, update } = useSession();
-  
+
   const user = session?.user;
   const token = (user as { accessToken?: string })?.accessToken;
 
-  const [formData, setFormData] = useState<FormState>({ 
-    username: "", 
-    email: "", 
-    bio: "", 
-    createdAt: "" 
+  const [formData, setFormData] = useState<FormState>({
+    username: "",
+    email: "",
+    bio: "",
+    createdAt: ""
   });
-  
-  const [initialData, setInitialData] = useState<FormState>({ 
-    username: "", 
-    email: "", 
-    bio: "", 
-    createdAt: "" 
+
+  const [initialData, setInitialData] = useState<FormState>({
+    username: "",
+    email: "",
+    bio: "",
+    createdAt: ""
   });
 
   const [isSaving, setIsSaving] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [selectedAvatar, setSelectedAvatar] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // Синхронизируем с внешним currentAvatarUrl
   useEffect(() => {
     if (user) {
       const data: FormState = {
@@ -51,7 +54,7 @@ export const ProfileSettingTab = ({ onUpdate }: ProfileSettingTabProps) => {
         bio: (user as { bio?: string }).bio ?? "",
         createdAt: (user as { createdAt?: string }).createdAt ?? ""
       };
-      
+
       setFormData(data);
       setInitialData(data);
     }
@@ -63,8 +66,32 @@ export const ProfileSettingTab = ({ onUpdate }: ProfileSettingTabProps) => {
     setIsSuccess(false);
 
     try {
+      // Сначала отправляем аватарку, если она выбрана
+      let avatarUrl: string | undefined;
+      if (selectedAvatar) {
+        const avatarFormData = new FormData();
+        avatarFormData.append('file', selectedAvatar);
+
+        const avatarResponse = await fetch('${process.env.NEXT_PUBLIC_API_URL}/profile/avatar', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: avatarFormData
+        });
+
+        if (avatarResponse.ok) {
+          const avatarData = await avatarResponse.json();
+          avatarUrl = avatarData.avatarUrl;
+          await update({
+            user: {
+              ...user,
+              image: avatarData.avatarUrl
+            }
+          });
+        }
+      }
+
       if (formData.username !== initialData.username) {
-        await fetch('/api/profile/username', {
+        await fetch('${process.env.NEXT_PUBLIC_API_URL}/profile/username', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({ username: formData.username })
@@ -72,7 +99,7 @@ export const ProfileSettingTab = ({ onUpdate }: ProfileSettingTabProps) => {
       }
 
       if (formData.email !== initialData.email) {
-        await fetch('/api/profile/email', {
+        await fetch('${process.env.NEXT_PUBLIC_API_URL}/profile/email', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({ newEmail: formData.email })
@@ -80,7 +107,7 @@ export const ProfileSettingTab = ({ onUpdate }: ProfileSettingTabProps) => {
       }
 
       if (formData.bio !== initialData.bio) {
-        await fetch('/api/profile/bio', {
+        await fetch('${process.env.NEXT_PUBLIC_API_URL}/profile/bio', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({ bio: formData.bio })
@@ -93,16 +120,18 @@ export const ProfileSettingTab = ({ onUpdate }: ProfileSettingTabProps) => {
           name: formData.username,
           email: formData.email,
           bio: formData.bio,
-          createdAt: formData.createdAt 
+          createdAt: formData.createdAt
         }
       });
 
       if (onUpdate) {
-        setTimeout(() => onUpdate(), 300);
+        setTimeout(() => onUpdate(avatarUrl), 300);
       }
 
       setIsSuccess(true);
       setInitialData({ ...formData });
+      setSelectedAvatar(null);
+      setPreview(null);
       setTimeout(() => setIsSuccess(false), 3000);
 
     } catch (error) {
@@ -122,30 +151,36 @@ export const ProfileSettingTab = ({ onUpdate }: ProfileSettingTabProps) => {
           </div>
           
           <div className="flex items-center gap-4">
-            <Image 
-              width={100} height={100} 
-              className="h-25 w-25 rounded-2xl object-cover" 
-              src={preview ?? user?.image ?? noAvatar} 
-              alt="avatar" 
+            <Image
+              width={100} height={100}
+              className="h-25 w-25 rounded-2xl object-cover"
+              src={preview ?? (user as { image?: string })?.image ?? externalAvatarUrl ?? noAvatar}
+              alt="avatar"
             />
             <div className="flex flex-col gap-1">
               <p className="text-white text-lg font-bold">Фото профиля</p>
               <div className="flex gap-3 mt-2">
-                <input 
-                  type="file" accept="image/*" ref={fileInputRef} className="hidden" 
+                <input
+                  type="file" accept="image/*" ref={fileInputRef} className="hidden"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
-                    if (file) setPreview(URL.createObjectURL(file));
-                  }} 
+                    if (file) {
+                      setSelectedAvatar(file);
+                      setPreview(URL.createObjectURL(file));
+                    }
+                  }}
                 />
-                <button 
-                  onClick={() => fileInputRef.current?.click()} 
+                <button
+                  onClick={() => fileInputRef.current?.click()}
                   className="cursor-pointer bg-orange-500 rounded-xl py-1.5 px-4 text-white hover:bg-orange-600 transition-colors"
                 >
                   Изменить
                 </button>
-                <button 
-                  onClick={() => setPreview(null)} 
+                <button
+                  onClick={() => {
+                    setSelectedAvatar(null);
+                    setPreview(null);
+                  }}
                   className="cursor-pointer bg-gray-500/20 rounded-xl py-1.5 px-4 text-white hover:bg-gray-500/40 transition-colors"
                 >
                   Удалить

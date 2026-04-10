@@ -11,6 +11,7 @@ import { Property } from "~/entities/Property";
 import { SideBar } from "~/features/SideBar";
 import { ReviewCols } from "~/widgets/ReviewPage/ui/ReviewCols";
 import type { Review } from "~/widgets/ReviewPage/ui/ReviewCols";
+import { useAvatarMap } from "~/shared/hooks/useAvatarMap";
 
 interface PaginatedResponse<T> {
   content: T[];
@@ -78,6 +79,8 @@ export default function HomePage() {
     enabled: status !== "loading",
     placeholderData: (previousData) => previousData,
   });
+
+  const avatarMap = useAvatarMap((reviews ?? []).map(r => r.userId));
 
   return (
     <main className="py-10">
@@ -173,12 +176,13 @@ export default function HomePage() {
                     <p className="text-red-400">Ошибка загрузки данных</p>
                   </div>
                 ) : reviews && reviews.length > 0 ? (
-                  <ReviewCols 
-                    reviews={reviews} 
+                  <ReviewCols
+                    reviews={reviews}
+                    avatarMap={avatarMap}
                     onActionSuccess={() => {
                       // 3. Вызываем refetch при действиях (лайк, удаление)
                       void refetchReviews();
-                    }} 
+                    }}
                   />
                 ) : (
                   <div className="bg-glass border border-dashed border-frostedglass rounded-3xl py-16 text-center">

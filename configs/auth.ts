@@ -8,6 +8,7 @@ interface ProfileData {
   email?: string;
   bio?: string;
   createdAt?: string;
+  avatarUrl?: string;
 }
 
 interface LoginResponse {
@@ -27,11 +28,12 @@ declare module "next-auth" {
     id: string;
     email: string;
     name?: string;
+    image?: string;
     accessToken: string;
     refreshToken: string;
     accessTokenExpires: number;
-    bio?: string;     
-    createdAt?: string; 
+    bio?: string;
+    createdAt?: string;
   }
   interface Session {
     user: User;
@@ -47,6 +49,7 @@ declare module "next-auth/jwt" {
     accessTokenExpires: number;
     name?: string | null;
     email?: string | null;
+    image?: string | null;
     bio?: string;
     createdAt?: string;
     error?: string;
@@ -165,6 +168,7 @@ export const authOptions: AuthOptions = {
             id: userId,
             name: profileData?.username ?? credentials.email.split('@')[0],
             email: credentials.email,
+            image: profileData?.avatarUrl,
             accessToken: token,
             refreshToken: loginData.refreshToken,
             // Бэк не присылает время жизни — фиксированная длительность 1 час
@@ -191,6 +195,7 @@ export const authOptions: AuthOptions = {
           accessTokenExpires: user.accessTokenExpires,
           name: user.name,
           email: user.email,
+          image: user.image,
           bio: user.bio,
           createdAt: user.createdAt,
         };
@@ -205,6 +210,8 @@ export const authOptions: AuthOptions = {
           name: session.user.name,
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           email: session.user.email ?? token.email,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          image: session.user.image ?? token.image,
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           bio: session.user.bio ?? token.bio,
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
@@ -242,6 +249,7 @@ export const authOptions: AuthOptions = {
         session.user.refreshToken = token.refreshToken;
         session.user.name = token.name ?? undefined;
         session.user.email = token.email ?? "";
+        session.user.image = token.image ?? undefined;
         session.user.bio = token.bio;
         session.user.createdAt = token.createdAt;
         session.user.accessTokenExpires = token.accessTokenExpires;

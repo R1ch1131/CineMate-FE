@@ -27,10 +27,11 @@ export interface Review {
 
 interface ReviewColsProps {
   reviews?: Review[];
+  avatarMap?: Record<string, string>;
   onActionSuccess?: () => void;
 }
 
-export const ReviewCols: React.FC<ReviewColsProps> = ({ reviews = [], onActionSuccess }) => {
+export const ReviewCols: React.FC<ReviewColsProps> = ({ reviews = [], avatarMap = {}, onActionSuccess }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -47,10 +48,10 @@ export const ReviewCols: React.FC<ReviewColsProps> = ({ reviews = [], onActionSu
     <div className="flex flex-col gap-6">
       <div className="grid grid-cols-1 gap-4">
         {currentReviews.map((review) => (
-          <Reviews 
-            key={review.id} 
-            review={review} 
-            onActionSuccess={onActionSuccess} 
+          <Reviews
+            key={review.id}
+            review={{ ...review, userImage: review.userImage ?? avatarMap[review.userId] }}
+            onActionSuccess={onActionSuccess}
           />
         ))}
       </div>

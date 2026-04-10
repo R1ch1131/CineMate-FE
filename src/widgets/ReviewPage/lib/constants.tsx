@@ -23,6 +23,6 @@ export const REVIEW_TABS = [
     name: "Рекомендации",
     icon: <TrendingUp size={18} />,
     id: "recommended",
-    endpoint: "/reviews",
+    endpoint: "/reviews/all",
   },
 ] as const;

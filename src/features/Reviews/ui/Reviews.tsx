@@ -173,11 +173,6 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
         setLocalLikesCount(context.oldCount);
       }
     },
-    onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: ["reviews"] });
-      void queryClient.invalidateQueries({ queryKey: ["home-reviews"] });
-      onActionSuccess?.();
-    },
   });
 
   const { mutate: toggleFavorite } = useMutation({
@@ -203,11 +198,6 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
       if (context) {
         setLocalIsFavorited(context.isCurrentlyFavorited);
       }
-    },
-    onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: ["reviews"] });
-      void queryClient.invalidateQueries({ queryKey: ["home-reviews"] });
-      onActionSuccess?.();
     },
   });
 
@@ -258,9 +248,9 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
 
             <div className="flex items-center gap-3">
               <div className="relative h-10 w-10 overflow-hidden rounded-full border border-white/10 bg-white/5 shrink-0">
-                <Image className="object-cover" src={review.userImage ?? Ava} alt="avatar" fill unoptimized />
+                <Image className="object-cover"  src={review.userImage ?? Ava} alt="avatar" fill unoptimized />
               </div>
-              <Link href={"/profile"}>
+              <Link href={userId === review.userId ? "/profile" : `/publicProfile?id=${review.userId}`}>
                 <p className="hover:text-lightorange text-white transition-colors cursor-pointer truncate max-w-37.5">
                   {review.userName}
                 </p>
@@ -466,7 +456,6 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
       {isCommentsOpen && (
         <CommentSection
           reviewId={review.id}
-          userImage={Ava}
           comments={comments}
           isLoading={isLoadingComments}
           onCommentSent={(newComment) => {

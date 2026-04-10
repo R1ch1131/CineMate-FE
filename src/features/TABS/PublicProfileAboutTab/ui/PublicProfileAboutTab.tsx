@@ -3,7 +3,7 @@ import Ava from "~/shared/assets/icons/noAvatar.jpg"
 
 export const PublicProfileAboutTab = () => {
   return (
-    <div className="flex flex-col gap-7 pt-3">
+    <div className="flex flex-col w-260 gap-7 pt-3">
       <div className="bg-frostedglass p-7 flex flex-col gap-5 rounded-2xl border border-white/25">
         <p className="text-xl font-bold">Интересы</p>
         <div className="flex gap-3">
