@@ -10,6 +10,7 @@ import { ReviewForm } from "./ReviewForm";
 import { ReviewCols } from "./ReviewCols";
 import type { Review } from "./ReviewCols";
 import { REVIEW_TABS } from "../lib/constants";
+import { useAvatarMap } from "~/shared/hooks/useAvatarMap";
 
 
 interface ReviewsResponse {
@@ -106,6 +107,7 @@ export const ReviewPage = () => {
 
   const reviews = data?.content ?? [];
   const totalElements = data?.totalElements ?? 0;
+  const avatarMap = useAvatarMap(reviews?.map(r => r.userId) ?? []);
 
   // Клиентская сортировка (если сервер не поддерживает sort)
   const sortedReviews = [...reviews].sort((a, b) => {
@@ -164,7 +166,7 @@ export const ReviewPage = () => {
                   <Loader2 className="animate-spin text-lightorange" size={40} />
                 </div>
               ) : (
-                <ReviewCols reviews={sortedReviews} onActionSuccess={handleRefresh} />
+                <ReviewCols reviews={sortedReviews} avatarMap={avatarMap} onActionSuccess={handleRefresh} />
               )}
             </div>
           </div>

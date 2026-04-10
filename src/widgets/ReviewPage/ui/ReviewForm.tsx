@@ -90,7 +90,7 @@ export const ReviewForm = ({ initialData, isEdit = false, onSuccess, trigger }: 
     setIsSearching(true);
     try {
       const response = await fetch(
-        `/api/movies/search?query=${encodeURIComponent(query)}&page=0&size=10`,
+        `${process.env.NEXT_PUBLIC_API_URL}/movies/search?query=${encodeURIComponent(query)}&page=0&size=10`,
         { signal }
       );
       if (!response.ok) throw new Error("Ошибка поиска");

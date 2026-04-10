@@ -5,7 +5,7 @@ import Film from "~/shared/assets/icons/filmImage.jpg"
 export const PublicProfileStatsTab = () => {
   return (
    
-    <div className="flex flex-col gap-7 pt-3 pb-10">
+    <div className="flex flex-col w-260 gap-7 pt-3 pb-10">
      <div className="bg-frostedglass p-7 rounded-2xl border border-white/30">
       <p className="text-xl font-bold pb-5">Любимые жанры</p>
       <div className="flex gap-3">

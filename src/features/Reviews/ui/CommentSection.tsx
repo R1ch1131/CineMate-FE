@@ -1,14 +1,17 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import Image, { type StaticImageData } from "next/image";
+import React, { useState, useRef, useMemo } from "react";
+import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { Dot, LucideThumbsUp, Send, Undo2, X, ChevronDown, ChevronUp } from "lucide-react";
 import { Field, Textarea } from "@headlessui/react";
 import clsx from "clsx";
+import { useAvatarMap } from "~/shared/hooks/useAvatarMap";
+import noAvatar from "~/shared/assets/icons/noAvatar.jpg";
 
 interface Comment {
   id: string;
+  userId?: string;
   userName: string;
   content: string;
   likesCount: number;
@@ -19,35 +22,47 @@ interface Comment {
 
 interface CommentSectionProps {
   reviewId: string;
-  userImage: StaticImageData | string;
   comments: Comment[];
   isLoading: boolean;
   onCommentSent: (newComment: Comment) => void;
 }
 
-// Вспомогательный компонент для одного комментария с логикой сворачивания
-type UserImageType = StaticImageData | string;
+// Собирает все userId из комментариев и вложенных ответов
+function collectUserIds(comments: Comment[]): string[] {
+  const ids: string[] = [];
+  const walk = (list: Comment[]) => {
+    list.forEach(c => {
+      if (c.userId) ids.push(c.userId);
+      if (c.replies) walk(c.replies);
+    });
+  };
+  walk(comments);
+  return ids;
+}
 
-const CommentItem = ({ 
-  comment, 
-  userImage, 
-  onReply, 
-  isReply = false 
-}: { 
-  comment: Comment; 
-  // 2. Заменяем any на корректный союзный тип
-  userImage: UserImageType; 
+// Вспомогательный компонент для одного комментария с логикой сворачивания
+const CommentItem = ({
+  comment,
+  avatarMap,
+  onReply,
+  isReply = false
+}: {
+  comment: Comment;
+  avatarMap: Record<string, string>;
   onReply: (id: string, name: string) => void;
   isReply?: boolean;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const hasReplies = comment.replies && comment.replies.length > 0;
+  const commentAvatar = comment.userId
+    ? (avatarMap[comment.userId] ?? noAvatar)
+    : noAvatar;
 
   return (
     <div className={clsx("flex flex-col gap-2", isReply && "ml-10 mt-2")}>
       <div className="flex gap-4 p-3 bg-white/5 rounded-2xl border border-white/5 transition-colors hover:bg-white/[0.07]">
         <div className="h-10 w-10 rounded-full overflow-hidden shrink-0 border border-white/10">
-          <Image src={userImage} alt="avatar" width={40} height={40} className="object-cover" />
+          <Image src={commentAvatar} alt="avatar" width={40} height={40} className="object-cover" unoptimized={typeof commentAvatar === 'string'} />
         </div>
         <div className="flex flex-col w-full">
           <div className="flex items-center text-sm">
@@ -60,19 +75,19 @@ const CommentItem = ({
           <p className="text-gray-300 mt-1 text-sm leading-relaxed">{comment.content}</p>
           <div className="flex gap-4 mt-3 text-grey text-xs">
             <button className="flex items-center gap-1.5 hover:text-red-400 transition-colors">
-              <LucideThumbsUp size={14} /> 
+              <LucideThumbsUp size={14} />
               <span>{comment.likesCount}</span>
             </button>
-            <button 
+            <button
               onClick={() => onReply(comment.id, comment.userName)}
               className="flex items-center gap-1.5 hover:text-amber-500 transition-colors"
             >
-              <Undo2 size={14} /> 
+              <Undo2 size={14} />
               <span>Ответить</span>
             </button>
-            
+
             {hasReplies && (
-              <button 
+              <button
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="flex items-center gap-1 text-amber-500/80 hover:text-amber-500 transition-colors font-medium ml-auto"
               >
@@ -84,16 +99,16 @@ const CommentItem = ({
         </div>
       </div>
 
-      {/* Отрисовка вложенных ответов только если развернуто */}
+      {/* Отрисовка вложенных ответов только если развёрнуто */}
       {hasReplies && isExpanded && (
         <div className="animate-in slide-in-from-top-2 duration-300">
           {comment.replies!.map((reply) => (
-            <CommentItem 
-              key={reply.id} 
-              comment={reply} 
-              userImage={userImage} 
-              onReply={onReply} 
-              isReply={true} 
+            <CommentItem
+              key={reply.id}
+              comment={reply}
+              avatarMap={avatarMap}
+              onReply={onReply}
+              isReply={true}
             />
           ))}
         </div>
@@ -104,7 +119,6 @@ const CommentItem = ({
 
 export const CommentSection: React.FC<CommentSectionProps> = ({
   reviewId,
-  userImage,
   comments,
   isLoading,
   onCommentSent
@@ -115,20 +129,29 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   const [replyTo, setReplyTo] = useState<{ id: string; name: string } | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Собираем все userId из комментариев и ответов
+  const allUserIds = useMemo(() => collectUserIds(comments), [comments]);
+
+  // Подгружаем аватарки
+  const avatarMap = useAvatarMap(allUserIds);
+
+  // Аватарка текущего пользователя
+  const currentUserImage = (session?.user as { image?: string })?.image ?? noAvatar;
+
   const handleSend = async () => {
     if (!text.trim() || isSending) return;
     setIsSending(true);
-    
-    // Создаём оптимистичный комментарий для немедленного отображения
+
     const optimisticComment: Comment = {
       id: `temp-${Date.now()}`,
+      userId: session?.user?.id,
       userName: session?.user?.name ?? "Вы",
       content: text.trim(),
       likesCount: 0,
       createdAt: new Date().toISOString(),
       replies: []
     };
-    
+
     try {
       const res = await fetch(`/api/reviews/${reviewId}/comments`, {
         method: "POST",
@@ -146,10 +169,8 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
       if (res.ok) {
         setText("");
         setReplyTo(null);
-        // Передаём новый комментарий в родительский компонент для оптимистичного обновления
         onCommentSent({
           ...optimisticComment,
-          // Для ответов важно указать parentId для правильной вложенности
           ...(replyTo && { parentId: replyTo.id })
         });
       }
@@ -169,17 +190,17 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   return (
     <div className="mt-6 space-y-6 animate-in fade-in duration-500">
       <div className="border-frostedglass w-full border-t" />
-      
+
       <div className="space-y-4">
         {isLoading ? (
           <div className="flex justify-center py-4"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-600" /></div>
         ) : comments && comments.length > 0 ? (
           comments.map((comment) => (
-            <CommentItem 
-              key={comment.id} 
-              comment={comment} 
-              userImage={userImage} 
-              onReply={startReply} 
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+              avatarMap={avatarMap}
+              onReply={startReply}
             />
           ))
         ) : (
@@ -189,7 +210,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 
       {/* Поле ввода */}
       <div className="flex gap-4 mt-8 items-start relative">
-        <Image className="h-10 w-10 rounded-full object-cover border border-white/10" src={userImage} alt="me" width={40} height={40} />
+        <Image className="h-10 w-10 rounded-full object-cover border border-white/10" src={currentUserImage} alt="me" width={40} height={40} unoptimized={typeof currentUserImage === 'string'} />
         <div className="w-full space-y-2">
           {replyTo && (
             <div className="flex items-center justify-between bg-amber-600/10 border border-amber-600/20 px-3 py-1.5 rounded-lg text-xs animate-in slide-in-from-left-2">
@@ -201,7 +222,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
               </button>
             </div>
           )}
-          
+
           <Field>
             <Textarea
               ref={textareaRef}
@@ -216,7 +237,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
             />
           </Field>
           <div className="flex justify-end">
-            <button 
+            <button
               onClick={handleSend}
               disabled={!text.trim() || isSending || !session}
               className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-amber-600 text-white text-sm font-bold hover:bg-amber-500 disabled:bg-white/5 disabled:text-grey transition-all shadow-lg shadow-amber-900/10"

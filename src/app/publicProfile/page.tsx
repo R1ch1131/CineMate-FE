@@ -1,11 +1,17 @@
 
 import { ProfileCardOther } from "~/widgets/ProfileCardOther/ui/ProfileCardOther";
 
-export default function HomePage() {
+interface PageProps {
+  searchParams: Promise<{ id: string }>;
+}
+
+export default async function HomePage({ searchParams }: PageProps) {
+  const { id: userId } = await searchParams;
+
   return (
     <main>
       <div className="flex justify-center">
-        <ProfileCardOther description={"Кинокритик с 15-летним смеильдииним смеильдииним смеильдииним смеильдииним смеильдииним смеильдииндииним смеильдииним смеильдииним смеильдииним смеильдииним смеильдиинимсмеильдиинмсмеильдииним смеильди"} date={"21 января 2024 г."}/>
+        <ProfileCardOther userId={userId} />
       </div>
     </main>
   );

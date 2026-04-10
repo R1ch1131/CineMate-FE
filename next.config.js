@@ -8,12 +8,16 @@ const config = {
         port: "8080",
         pathname: "/**",
       },
-      // Добавляем поддержку изображений от TMDB
       {
-  protocol: "https",
-  hostname: "image.tmdb.org",
-  pathname: "**", // Разрешаем всё для теста
-},
+        protocol: "https",
+        hostname: "image.tmdb.org",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: "s3.twcstorage.ru",
+        pathname: "/**",
+      },
     ],
   },
   async rewrites() {

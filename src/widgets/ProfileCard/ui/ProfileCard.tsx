@@ -18,7 +18,7 @@ interface UserProfile {
   username?: string;
   bio?: string;
   createdAt?: string;
-  image?: string;
+  avatarUrl?: string;
 }
 
 const tabStyle =
@@ -31,14 +31,15 @@ export const ProfileCard = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState(0);
+  const [avatarKey, setAvatarKey] = useState(0); // Для принудительного обновления изображения
 
   const { data: stats, isLoading: statsLoading } = useProfileStats();
 
   const fetchProfile = useCallback(async () => {
     if (!token) return;
     try {
-      const response = await fetch('/api/profile/me', {
-        headers: { 
+      const response = await fetch('${process.env.NEXT_PUBLIC_API_URL}/profile/me', {
+        headers: {
           'Authorization': `Bearer ${token}`,
           'Cache-Control': 'no-cache'
         }
@@ -82,7 +83,7 @@ export const ProfileCard = () => {
   const displayUsername = profile?.username ?? sessionUser?.name ?? "Пользователь";
   const displayBio = profile?.bio ?? sessionUser?.bio ?? "Киноман и критик";
   const displayDate = profile?.createdAt ?? sessionUser?.createdAt;
-  const displayImage = profile?.image ?? sessionUser?.image ?? noAvatar;
+  const displayImage = profile?.avatarUrl ?? sessionUser?.image ?? noAvatar;
 
   return (
     <div className="border-grey/40 2k:h-80 h-78 2k:w-5/12 w-7/12 rounded-2xl bg-linear-to-r from-amber-500/10 to-orange-500/10 border">
@@ -90,6 +91,7 @@ export const ProfileCard = () => {
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-7">
             <Image
+              key={avatarKey}
               width={140} height={140}
               className="h-35 w-35 rounded-full object-cover shadow-2xl shadow-amber-500/30"
               src={displayImage}
@@ -102,7 +104,7 @@ export const ProfileCard = () => {
             </div>
           </div>
           <div
-            onClick={() => setSelectedTab(4)} 
+            onClick={() => setSelectedTab(3)} 
             className="flex cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gray-400/30 hover:bg-gray-50/30 text-white p-3 px-5 transition-all"
           >
             <Edit3 className="h-4 w-4" />
@@ -159,7 +161,7 @@ export const ProfileCard = () => {
           <TabPanel><ProfileReviewsTab /></TabPanel>
           {/* <TabPanel><ProfileLikeTab /></TabPanel> */}
           <TabPanel><ProfileDebateTab /></TabPanel>
-          <TabPanel><ProfileSettingTab onUpdate={() => { void fetchProfile(); }} /></TabPanel>
+          <TabPanel><ProfileSettingTab currentAvatarUrl={profile?.avatarUrl ?? (sessionUser as { image?: string })?.image} onUpdate={(newAvatarUrl) => { if (newAvatarUrl) { setProfile(prev => prev ? { ...prev, avatarUrl: newAvatarUrl } : null); setAvatarKey(k => k + 1); } void fetchProfile(); }} /></TabPanel>
         </TabPanels>
       </TabGroup>
     </div>

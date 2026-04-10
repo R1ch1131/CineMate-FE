@@ -10,7 +10,7 @@ import noAvatar from '~/shared/assets/icons/noAvatar.jpg'
 export const ProfileButton = () => {
   const { data: session } = useSession();
   const displayName = session?.user?.name ?? session?.user?.email?.split('@')[0] ?? "Гость";
-  const userImage = session?.user?.image ?? noAvatar;
+  const userImage = (session?.user as { image?: string })?.image ?? noAvatar;
 
   return (
     <div className="flex gap-4">
@@ -23,6 +23,7 @@ export const ProfileButton = () => {
       >
         <div className="relative h-7 w-7 overflow-hidden rounded-full border border-white/10 bg-white/5">
           <Image
+            key={typeof userImage === 'string' ? userImage : 'default'}
             fill
             className="object-cover"
             src={userImage}

@@ -5,7 +5,8 @@ import { ChevronDown, Plus, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-import { ReviewCols } from "~/widgets/ReviewPage/ui/ReviewCols"; // Путь к твоему компоненту
+import { ReviewCols } from "~/widgets/ReviewPage/ui/ReviewCols";
+import { useAvatarMap } from "~/shared/hooks/useAvatarMap";
 
 export const ProfileReviewsTab = () => {
   const { data: session } = useSession();
@@ -29,6 +30,7 @@ export const ProfileReviewsTab = () => {
   });
 
   const reviews = data?.content ?? [];
+  const avatarMap = useAvatarMap(reviews.map((r: { userId?: string }) => r.userId).filter(Boolean) as string[]);
 
   return (
     <div className="pt-2">
@@ -69,7 +71,7 @@ export const ProfileReviewsTab = () => {
               Обновление данных...
             </div>
           )}
-          <ReviewCols reviews={reviews} onActionSuccess={() => void refetch()} />
+          <ReviewCols reviews={reviews} avatarMap={avatarMap} onActionSuccess={() => void refetch()} />
         </div>
       )}
     </div>
