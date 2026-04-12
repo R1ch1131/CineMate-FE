@@ -26,7 +26,6 @@ const config = {
         source: '/api/profile/:path*',
         destination: 'http://72.56.106.83:8080/api/profile/:path*',
       },
-      // Добавляем прокси для рецензий
       {
         source: '/api/reviews/:path*',
         destination: 'http://72.56.106.83:8080/api/reviews/:path*',

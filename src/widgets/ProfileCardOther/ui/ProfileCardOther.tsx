@@ -79,7 +79,6 @@ export const ProfileCardOther = ({ userId }: ProfileCardProps) => {
     void fetchProfile();
   }, [userId, session]);
 
-  // Загружаем статистику рецензий
   useEffect(() => {
     const fetchStats = async () => {
       if (!userId) return;

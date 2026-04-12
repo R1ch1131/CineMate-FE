@@ -16,7 +16,6 @@ interface RegisterFormData {
   confirmPassword: string;
 }
 
-// Тип для ответа от API регистрации
 interface RegisterResponse {
   message?: string;
   user?: {

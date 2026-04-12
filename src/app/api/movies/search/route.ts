@@ -4,20 +4,17 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('query');
-    const page = searchParams.get('page') || '0';
-    const size = searchParams.get('size') || '20';
+    const page = searchParams.get('page') ?? '0';
+    const size = searchParams.get('size') ?? '20';
 
     if (!query) return NextResponse.json([]);
 
-    // Убедись, что этот адрес ПРАВИЛЬНЫЙ и бэкенд там запущен
-    const BACKEND_URL = 'http://72.56.106.83:8080'; 
-    const targetUrl = `${BACKEND_URL}/api/movies/search?query=${encodeURIComponent(query)}&page=${page}&size=${size}`;
+    const targetUrl = `${process.env.NEXT_PUBLIC_API_URL}/movies/search?query=${encodeURIComponent(query)}&page=${page}&size=${size}`;
 
     console.log('Sending request to:', targetUrl);
 
-    // Добавляем AbortController, чтобы запрос не висел вечно
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 секунд на ответ
+    const timeoutId = setTimeout(() => controller.abort(), 5000); 
 
     const response = await fetch(targetUrl, {
       method: 'GET',
@@ -26,7 +23,7 @@ export async function GET(request: Request) {
         'Content-Type': 'application/json',
       },
       signal: controller.signal,
-      cache: 'no-store' // Чтобы не было проблем с кэшем при разработке
+      cache: 'no-store' 
     });
 
     clearTimeout(timeoutId);

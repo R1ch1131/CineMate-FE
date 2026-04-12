@@ -24,17 +24,14 @@ type Props = {
 
 const ITEMS_PER_PAGE = 20;
 
-// ✅ fetch all pages from backend for a category
 const fetchMovies = async (category: Category): Promise<Movie[]> => {
   if (category === "all") {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/movies/list/all`);
     if (!res.ok) throw new Error("Ошибка загрузки");
 
-    // ✅ Явно типизируем результат
     const data: unknown = await res.json();
     if (!Array.isArray(data)) throw new Error("Неверный формат данных");
 
-    // ✅ приводим каждый элемент к Movie
     return data.map(item => item as Movie);
   }
 
@@ -59,7 +56,6 @@ const fetchMovies = async (category: Category): Promise<Movie[]> => {
   return allMovies;
 };
 
-// ✅ search filter
 const filterMoviesBySearch = (movies: Movie[], searchQuery: string) => {
   if (!searchQuery.trim()) return movies;
   const query = searchQuery.toLowerCase().trim();

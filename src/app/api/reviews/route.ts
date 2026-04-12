@@ -2,22 +2,19 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next"; 
 import { authOptions } from '../auth/[...nextauth]/route';
 
-// 1. ДОБАВЛЯЕМ GET (чтобы ReviewPage могла скачивать список)
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const page = searchParams.get('page') || '0';
-    const size = searchParams.get('size') || '20';
+    const page = searchParams.get('page') ?? '0';
+    const size = searchParams.get('size') ?? '20';
     
     const session = await getServerSession(authOptions);
 
-    // Запрашиваем данные у реального бэкенда
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews?page=${page}&size=${size}`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        // Если есть сессия, прокидываем токен (для лайков/избранного)
         ...(session?.user?.accessToken && {
           'Authorization': `Bearer ${session.user.accessToken}`
         }),
@@ -35,7 +32,6 @@ export async function GET(request: Request) {
   }
 }
 
-// 2. ТВОЙ ПОСТ (с небольшой правкой типов)
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -46,12 +42,10 @@ export async function POST(request: Request) {
 
     const body = await request.json();
 
-    // Чистим payload (убираем лишнее, что бэк может не принять)
     const payload = {
       movieId: Number(body.movieId),
       movieTitle: body.movieTitle,
       moviePosterPath: body.moviePosterPath,
-      // Если бэк сам ставит дату, createdAt можно не слать, но оставим для верности
       movieReleaseDate: body.movieReleaseDate ? new Date(body.movieReleaseDate).toISOString() : new Date().toISOString(),
       content: body.content,
       rating: Number(body.rating),

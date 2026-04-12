@@ -8,7 +8,7 @@ interface EmailInputProps {
   register?: UseFormRegisterReturn;
   placeholder?: string;
   label?: string;
-  disabled?: boolean; // Добавлено
+  disabled?: boolean; 
 }
 
 export const EmailInput: React.FC<EmailInputProps> = ({
@@ -16,7 +16,7 @@ export const EmailInput: React.FC<EmailInputProps> = ({
   register,
   placeholder = "example@cinemate.com",
   label = "Email адрес",
-  disabled = false, // Добавлено со значением по умолчанию
+  disabled = false,
   ...props
 }) => {
   return (
@@ -28,15 +28,15 @@ export const EmailInput: React.FC<EmailInputProps> = ({
             <Input 
               type="email"
               placeholder={placeholder}
-              disabled={disabled} // Добавлено
+              disabled={disabled} 
               className={`block w-full rounded-xl outline-1 outline-grey bg-frostedglass py-3 text-sm/6 text-white focus:outline-lightorange pl-12 ${
                 error ? 'outline-red-500' : ''
-              } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`} // Добавлены стили для disabled
+              } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`} 
               {...register}
               {...props}
             />
             <div className="absolute left-3.5 top-1/2 transform -translate-y-1/2">
-              <Mail className={`${disabled ? 'text-gray-400' : 'text-white'}`}/> {/* Изменен цвет при disabled */}
+              <Mail className={`${disabled ? 'text-gray-400' : 'text-white'}`}/> 
             </div>
           </div>
           {error && (

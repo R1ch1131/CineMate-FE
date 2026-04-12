@@ -1,4 +1,3 @@
-// features/MyList/ui/SortMenu.tsx
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDown } from "lucide-react";
 import { SORT_OPTIONS } from "../lib/constants";

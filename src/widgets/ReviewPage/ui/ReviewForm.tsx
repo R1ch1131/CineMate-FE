@@ -8,7 +8,6 @@ import Image from "next/image";
 import { StarRating } from "./StarRating";
 import { useSession } from "next-auth/react";
 
-// Интерфейс фильма
 interface Movie {
   id: string;
   tmdbId: number;
@@ -20,7 +19,6 @@ interface Movie {
   genres: string[];
 }
 
-// Описываем структуру данных для редактирования
 interface ReviewInitialData {
   id: string | number;
   content: string;
@@ -95,11 +93,9 @@ export const ReviewForm = ({ initialData, isEdit = false, onSuccess, trigger }: 
       );
       if (!response.ok) throw new Error("Ошибка поиска");
 
-      // Явная типизация ответа
       const data = (await response.json()) as Movie[];
       setSearchResults(Array.isArray(data) ? data : []);
     } catch (error: unknown) {
-      // Правильная обработка unknown ошибки
       if (error instanceof Error && error.name !== "AbortError") {
         setSearchResults([]);
       }
@@ -113,8 +109,6 @@ export const ReviewForm = ({ initialData, isEdit = false, onSuccess, trigger }: 
 
     const controller = new AbortController();
     const timer = setTimeout(() => {
-      // Чтобы избежать "floating promise", просто вызываем функцию.
-      // Линтер может просить void, если функция внутри useEffect возвращает Promise.
       void searchMovies(searchQuery, controller.signal);
     }, 600);
 

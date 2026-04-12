@@ -100,7 +100,6 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
     setIsContentOverflow(false);
   }, [review]);
 
-  // Проверяем, превышает ли контент 4 строки
   useEffect(() => {
     const el = contentRef.current;
     if (!el) return;
@@ -208,7 +207,7 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
       if (accessToken) {
         headers.Authorization = `Bearer ${accessToken}`;
       }
-      const res = await fetch(`/api/reviews/${review.id}/comments?page=0&size=20`, { headers });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews/${review.id}/comments?page=0&size=20`, { headers });
       const data = (await res.json()) as { content?: Comment[] };
       setComments(data.content ?? []);
       setCommentsLoaded(true);
@@ -459,9 +458,7 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
           comments={comments}
           isLoading={isLoadingComments}
           onCommentSent={(newComment) => {
-            // Оптимистично добавляем новый комментарий сразу
             if (newComment.parentId) {
-              // Это ответ - добавляем как reply к родительскому комментарию
               setComments(prev => 
                 prev.map(comment => 
                   comment.id === newComment.parentId
@@ -470,13 +467,10 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
                 )
               );
             } else {
-              // Это обычный комментарий
               setComments(prev => [newComment, ...prev]);
             }
             setLocalCommentsCount(prev => prev + 1);
-            // Фоновая синхронизация с сервером (НЕ вызывает полный рефетч Reviews)
             void fetchComments();
-            // НЕ вызываем onActionSuccess?.() чтобы не триггерить рефетч всех рецензий
           }}
         />
       )}

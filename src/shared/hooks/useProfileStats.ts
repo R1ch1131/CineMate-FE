@@ -18,7 +18,6 @@ export function useProfileStats() {
         return { totalReviews: 0, totalLikes: 0 };
       }
 
-      // Загружаем все рецензии пользователя (пагинация с большим размером)
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/reviews/user/${userId}?page=0&size=1000`,
         {
@@ -36,7 +35,6 @@ export function useProfileStats() {
       const data = await response.json();
       const reviews = data?.content ?? [];
 
-      // Суммируем лайки со всех рецензий
       const totalLikes = reviews.reduce(
         (sum: number, review: { likesCount: number }) => sum + (review.likesCount ?? 0),
         0
@@ -48,6 +46,6 @@ export function useProfileStats() {
       };
     },
     enabled: !!userId && !!token,
-    staleTime: 5 * 60 * 1000, // 5 минут
+    staleTime: 5 * 60 * 1000, 
   });
 }
