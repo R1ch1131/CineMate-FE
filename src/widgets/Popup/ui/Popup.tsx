@@ -22,7 +22,6 @@ const fetchMovieDetails = async (movieId: number): Promise<MovieDetails> => {
   }
 
   const data = await res.json();
-  // ВАЖНО: Форсируем наличие id, если бэкенд прислал его как movieId или _id
   return {
     ...data,
     id: data.id || data.movieId || data._id || movieId 

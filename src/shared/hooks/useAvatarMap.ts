@@ -1,10 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 
-/**
- * Подгружает аватарки для списка userId через GET /api/profile/{id}
- * Возвращает мапу userId → avatarUrl
- */
 export function useAvatarMap(userIds: string[]) {
   const { data: session } = useSession();
   const [avatarMap, setAvatarMap] = useState<Record<string, string>>({});

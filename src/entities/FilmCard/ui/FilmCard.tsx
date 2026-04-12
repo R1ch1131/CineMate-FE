@@ -112,7 +112,7 @@ export const FilmCard = ({ movie, variant = 'grid' }: FilmCardProps) => {
         className="group cursor-pointer transition-transform hover:-translate-y-2.5 duration-400"
         onClick={openPopup}
       >
-        <div className="relative h-74">
+        <div className="relative h-80 ">
           <Image
             src={movie.posterUrl}
             alt={movie.title}

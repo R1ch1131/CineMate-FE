@@ -31,14 +31,14 @@ export const ProfileCard = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState(0);
-  const [avatarKey, setAvatarKey] = useState(0); // Для принудительного обновления изображения
+  const [avatarKey, setAvatarKey] = useState(0); 
 
   const { data: stats, isLoading: statsLoading } = useProfileStats();
 
   const fetchProfile = useCallback(async () => {
     if (!token) return;
     try {
-      const response = await fetch('${process.env.NEXT_PUBLIC_API_URL}/profile/me', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile/me`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Cache-Control': 'no-cache'

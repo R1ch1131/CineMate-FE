@@ -9,9 +9,9 @@ interface FilmMyListStatusProps{
 
 export const FilmMyListStatus = ({icon:Icon ,text, color}: FilmMyListStatusProps) =>{
     return(
-        <div className={`rounded-lg border flex center px-2 py-1 gap-1 ${color} `}>
-           {Icon && <Icon className={`h-3 w-3 `} />}
-           <p className="text-xs">{text}</p>
+        <div className={`rounded-lg border flex center px-4 py-1 gap-2 ${color} `}>
+           {Icon && <Icon className={`h-4 w-4 `} />}
+           <p className="">{text}</p>
         </div>
     )
 }

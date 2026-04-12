@@ -5,11 +5,10 @@ export const MyListHeader = () => (
       <p>Ваша личная</p>
       <p className="gradient">кинотека</p>
     </span>
-    <span className="flex flex-col center pt-10 gap-4 text-xl">
+    <span className="flex flex-col center py-10 gap-4 text-xl">
       <p className="text-grey">
-        Организуйте свои фильмы, отслеживайте прогресс просмотра и получайте
+        Организуйте свои фильмы, отслеживайте прогресс просмотра 
       </p>
-      <p className="text-grey pb-10">персональные рекомендации</p>
     </span>
   </div>
 );

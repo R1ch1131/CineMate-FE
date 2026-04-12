@@ -13,14 +13,12 @@ export default async function middleware(req: NextRequest) {
     req.nextUrl.pathname.startsWith("/profile") ||
     req.nextUrl.pathname.startsWith("/protected");
 
-  // Если пользователь не авторизован и пытается зайти на защищенный маршрут
   if (!token && isProtectedRoute) {
     const loginUrl = new URL("/auth", req.url);
     loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Если пользователь авторизован и пытается зайти на страницу авторизации
   if (token && isAuthPage) {
     return NextResponse.redirect(new URL("/profile", req.url));
   }

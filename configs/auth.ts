@@ -80,10 +80,8 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
 
     return {
       ...token,
-      // Бэк всегда присылает новый refreshToken при ротации
       refreshToken: data.refreshToken ?? token.refreshToken,
       accessToken: data.token,
-      // Фиксированная длительность 1 час (бэк не присылает expiresIn)
       accessTokenExpires: Date.now() + 60 * 60 * 1000,
       error: undefined,
     };
@@ -171,7 +169,6 @@ export const authOptions: AuthOptions = {
             image: profileData?.avatarUrl,
             accessToken: token,
             refreshToken: loginData.refreshToken,
-            // Бэк не присылает время жизни — фиксированная длительность 1 час
             accessTokenExpires: Date.now() + 60 * 60 * 1000,
             bio: profileData?.bio,
             createdAt: profileData?.createdAt
@@ -185,7 +182,6 @@ export const authOptions: AuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user, trigger, session }) {
-      // 1. ПЕРВИЧНЫЙ ВХОД
       if (user) {
         return {
           ...token,
@@ -200,8 +196,6 @@ export const authOptions: AuthOptions = {
           createdAt: user.createdAt,
         };
       }
-
-      // 2. ОБНОВЛЕНИЕ ПРОФИЛЯ
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (trigger === "update" && session?.user) {
         return {
@@ -219,22 +213,17 @@ export const authOptions: AuthOptions = {
         };
       }
 
-      // 3. ПРОВЕРКА ВРЕМЕНИ ЖИЗНИ
-      // Если до конца жизни токена больше 10 секунд, просто возвращаем текущий
       if (!token.accessTokenExpires || Date.now() < token.accessTokenExpires - 10000) {
-        // Если была ошибка рефреша — всё ещё помечаем
         if (token.error === "RefreshAccessTokenError") {
           return { ...token };
         }
         return token;
       }
 
-      // 4. ТОКЕН ИСТЕК — ЗАПУСКАЕМ РЕФРЕШ
       return await refreshAccessToken(token);
     },
 
     async session({ session, token }) {
-      // Если при рефреше произошла ошибка — разлогиниваем
       if (token.error === "RefreshAccessTokenError") {
         return {
           ...session,

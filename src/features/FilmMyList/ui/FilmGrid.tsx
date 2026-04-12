@@ -1,30 +1,41 @@
 import React, { useState } from "react";
 import { FilmMyList } from "./FilmMyList";
 
-export interface Film {
+export interface WatchlistItem {
+  tmdbId: number;
   title: string;
-  rating: number;
-  year: number;
+  voteAverage: number;
+  releaseDate: string;
+  posterPath: string;
+  posterUrl: string; 
+  status: string;
+  addedDate: string;
 }
 
 interface FilmGridProps {
-  films: Film[];
+  films: WatchlistItem[];
+  viewMode: "grid" | "list";
 }
 
-export const FilmGrid: React.FC<FilmGridProps> = ({ films: initialFilms }) => {
-  const [films, setFilms] = useState<Film[]>(initialFilms);
+export const FilmGrid: React.FC<FilmGridProps> = ({ films: initialFilms, viewMode }) => {
+  const [films, setFilms] = useState<WatchlistItem[]>(initialFilms);
 
-  const handleDelete = (title: string) => {
-    setFilms(prevFilms => prevFilms.filter(film => film.title !== title));
+  const handleDelete = (tmdbId: number) => {
+    setFilms(prevFilms => prevFilms.filter(film => film.tmdbId !== tmdbId));
   };
 
   return (
-    <div className="grid grid-cols-5  gap-7 pb-5 pt-5">
-      {films.map((film, index) => (
+    <div className={`mx-auto mt-8 max-w-7xl ${
+      viewMode === "grid"
+        ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8"
+        : "flex flex-col gap-4"
+    }`}>
+      {films.map((film) => (
         <FilmMyList
-          key={index}
+          key={film.tmdbId}
           film={film}
-          onDelete={() => handleDelete(film.title)}
+          variant={viewMode}
+          onDelete={() => handleDelete(film.tmdbId)}
         />
       ))}
     </div>

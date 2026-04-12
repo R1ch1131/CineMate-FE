@@ -1,10 +1,9 @@
-// StarRating.tsx
 'use client';
 import { Star } from "lucide-react";
 import React, { useState } from "react";
 
 interface StarRatingProps {
-  onChange: (rating: number) => void; // Добавляем пропс
+  onChange: (rating: number) => void; 
 }
 
 export const StarRating = ({ onChange }: StarRatingProps) => {

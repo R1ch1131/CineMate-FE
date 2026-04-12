@@ -111,7 +111,6 @@ export default function HomePage() {
         <div className="flex w-full max-w-7xl gap-8 px-4 lg:px-0">
           <div className="flex flex-1 flex-col gap-16">
             
-            {/* Секция фильмов */}
             <section className="flex flex-col gap-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -141,7 +140,6 @@ export default function HomePage() {
               </div>
             </section>
 
-            {/* Секция рецензий */}
             <section className="flex flex-col gap-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -159,7 +157,6 @@ export default function HomePage() {
               </div>
 
               <div className="min-h-75 relative">
-                {/* 2. Индикатор фонового обновления (показываем только если данные уже есть, но обновляются) */}
                 {isReviewsFetching && !isReviewsLoading && (
                   <div className="absolute -top-8 right-0 flex items-center gap-2 text-[11px] text-lightorange font-bold uppercase tracking-tighter animate-pulse">
                     <Loader2 size={12} className="animate-spin" />
@@ -180,7 +177,6 @@ export default function HomePage() {
                     reviews={reviews}
                     avatarMap={avatarMap}
                     onActionSuccess={() => {
-                      // 3. Вызываем refetch при действиях (лайк, удаление)
                       void refetchReviews();
                     }}
                   />

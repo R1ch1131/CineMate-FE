@@ -30,7 +30,6 @@ export const ReviewPage = () => {
   const queryClient = useQueryClient();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Debounce поиска
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
@@ -41,7 +40,6 @@ export const ReviewPage = () => {
     };
   }, [searchQuery]);
 
-  // Получаем текущий таб безопасно
   const currentTab = REVIEW_TABS[activeTab] ?? REVIEW_TABS[0];
 
   const { data, isLoading, isFetching } = useQuery<ReviewsResponse>({
@@ -49,16 +47,13 @@ export const ReviewPage = () => {
     queryFn: async () => {
       let url: string;
 
-      // Если есть поисковый запрос — используем соответствующий эндпоинт
       if (debouncedQuery.trim()) {
         const isUserSearch = debouncedQuery.startsWith('@');
         const query = isUserSearch ? debouncedQuery.slice(1) : debouncedQuery;
         
         if (isUserSearch) {
-          // Поиск по username
           url = `${process.env.NEXT_PUBLIC_API_URL}/reviews/search/user?username=${encodeURIComponent(query.trim())}&page=0&size=20&sort=${sortBy}`;
         } else {
-          // Поиск по названию фильма
           url = `${process.env.NEXT_PUBLIC_API_URL}/reviews/search/movie?title=${encodeURIComponent(query.trim())}&page=0&size=20&sort=${sortBy}`;
         }
       } else {
@@ -109,7 +104,6 @@ export const ReviewPage = () => {
   const totalElements = data?.totalElements ?? 0;
   const avatarMap = useAvatarMap(reviews?.map(r => r.userId) ?? []);
 
-  // Клиентская сортировка (если сервер не поддерживает sort)
   const sortedReviews = [...reviews].sort((a, b) => {
     if (sortBy === "createdAt,desc") {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();

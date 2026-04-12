@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from '../../../auth/[...nextauth]/route';
 
-// GET - получить комментарии к рецензии
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -10,8 +9,8 @@ export async function GET(
   try {
     const { id } = await params;
     const { searchParams } = new URL(request.url);
-    const page = searchParams.get('page') || '0';
-    const size = searchParams.get('size') || '20';
+    const page = searchParams.get('page') ?? '0';
+    const size = searchParams.get('size') ?? '20';
 
     const session = await getServerSession(authOptions);
 
@@ -45,7 +44,6 @@ export async function GET(
   }
 }
 
-// POST - создать комментарий к рецензии
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }

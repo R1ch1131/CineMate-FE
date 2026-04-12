@@ -27,7 +27,6 @@ interface CommentSectionProps {
   onCommentSent: (newComment: Comment) => void;
 }
 
-// Собирает все userId из комментариев и вложенных ответов
 function collectUserIds(comments: Comment[]): string[] {
   const ids: string[] = [];
   const walk = (list: Comment[]) => {
@@ -40,7 +39,6 @@ function collectUserIds(comments: Comment[]): string[] {
   return ids;
 }
 
-// Вспомогательный компонент для одного комментария с логикой сворачивания
 const CommentItem = ({
   comment,
   avatarMap,
@@ -99,7 +97,6 @@ const CommentItem = ({
         </div>
       </div>
 
-      {/* Отрисовка вложенных ответов только если развёрнуто */}
       {hasReplies && isExpanded && (
         <div className="animate-in slide-in-from-top-2 duration-300">
           {comment.replies!.map((reply) => (
@@ -129,13 +126,10 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   const [replyTo, setReplyTo] = useState<{ id: string; name: string } | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Собираем все userId из комментариев и ответов
   const allUserIds = useMemo(() => collectUserIds(comments), [comments]);
 
-  // Подгружаем аватарки
   const avatarMap = useAvatarMap(allUserIds);
 
-  // Аватарка текущего пользователя
   const currentUserImage = (session?.user as { image?: string })?.image ?? noAvatar;
 
   const handleSend = async () => {
@@ -153,7 +147,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
     };
 
     try {
-      const res = await fetch(`/api/reviews/${reviewId}/comments`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews/${reviewId}/comments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

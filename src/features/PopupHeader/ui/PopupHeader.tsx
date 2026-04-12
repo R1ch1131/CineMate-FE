@@ -21,7 +21,6 @@ export const PopupHeader = ({ movie, onTabChange }: PopupHeaderProps) => {
   const { data: session } = useSession();
   const queryClient = useQueryClient();
 
-  // МУТАЦИЯ: Добавление в список
   const { mutate: addToWatchlist, isPending } = useMutation({
     mutationFn: async (status: string) => {
       const token = session?.user?.accessToken;
@@ -40,10 +39,10 @@ export const PopupHeader = ({ movie, onTabChange }: PopupHeaderProps) => {
         const errorText = await res.text();
         throw new Error(errorText || "Ошибка сервера");
       }
-      return res.json() as unknown as Record<string, unknown>;
+      const text = await res.text();
+      return text ? (JSON.parse(text) as Record<string, unknown>) : null;
     },
     onSuccess: () => {
-      // Инвалидируем основной список, чтобы на странице MyList данные обновились
       void queryClient.invalidateQueries({ queryKey: ["watchlist"] });
     },
     onError: (error: Error) => {
@@ -57,7 +56,6 @@ export const PopupHeader = ({ movie, onTabChange }: PopupHeaderProps) => {
     addToWatchlist("WANT_TO_WATCH");
   };
 
-  // Вспомогательные функции форматирования
   const formatRuntime = (minutes?: number) => {
     if (!minutes) return "Н/Д";
     const hours = Math.floor(minutes / 60);
@@ -78,7 +76,6 @@ export const PopupHeader = ({ movie, onTabChange }: PopupHeaderProps) => {
 
   return (
     <div className="absolute bottom-4 left-6 flex items-end">
-      {/* Постер */}
       <div className="2k:h-70 2k:w-50 mr-4 h-58 w-42 overflow-hidden rounded-xl border-2 border-gray-600 shadow-2xl">
         <Image
           src={movie.posterUrl || FilmImage}
@@ -92,7 +89,6 @@ export const PopupHeader = ({ movie, onTabChange }: PopupHeaderProps) => {
 
       <div className="mb-2">
         <div className="2k:gap-3.5 flex flex-col gap-3">
-          {/* Свойства (Год, Время, ТОП) */}
           <div className="flex gap-4 2k:text-lg">
             <Property text={getYear().toString()} color="bg-orange-400" />
             {movie.runtime && (
@@ -122,14 +118,12 @@ export const PopupHeader = ({ movie, onTabChange }: PopupHeaderProps) => {
             <span className="text-gray-300 2k:text-xl">0 рецензий</span>
           </div>
 
-          {/* Жанры */}
           <div className="flex gap-2 pb-2 2k:text-lg">
             {movie.genres?.map((genre, index) => (
               <Property key={index} text={genre} color="bg-white/10 border border-white/20" />
             ))}
           </div>
 
-          {/* Кнопки действий */}
           <div className="flex gap-3.5">
             <PopupButton
               icon={Play}

@@ -1,17 +1,16 @@
-// shared/config/api.ts
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const API_ENDPOINTS = {
   auth: {
-    signIn: `${API_BASE_URL}/api/auth/sign-in`,
-    signUp: `${API_BASE_URL}/api/auth/sign-up`,
-    logout: `${API_BASE_URL}/api/auth/logout`,
-    refresh: `${API_BASE_URL}/api/auth/refresh`,
+    signIn: `${process.env.NEXT_PUBLIC_API_URL}/auth/sign-in`,
+    signUp: `${process.env.NEXT_PUBLIC_API_URL}/auth/sign-up`,
+    logout: `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
+    refresh: `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
   },
   movies: {
-    newReleases: `${API_BASE_URL}/api/movies/new-releases`,
-    topRated: `${API_BASE_URL}/api/movies/top-rated`,
-    upcoming: `${API_BASE_URL}/api/movies/upcoming`,
-    trending: `${API_BASE_URL}/api/movies/trending`,
+    newReleases: `${process.env.NEXT_PUBLIC_API_URL}/movies/new-releases`,
+    topRated: `${process.env.NEXT_PUBLIC_API_URL}/movies/top-rated`,
+    upcoming: `${process.env.NEXT_PUBLIC_API_URL}/movies/upcoming`,
+    trending: `${process.env.NEXT_PUBLIC_API_URL}/movies/trending`,
   },
 } as const;

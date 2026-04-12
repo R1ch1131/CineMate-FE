@@ -5,7 +5,7 @@ import { Filters } from "~/entities/Filters";
 import { Search, ChevronDown, TextAlignJustify, Grid2x2 } from "lucide-react";
 import { CategoryTile } from "~/entities/CategoryTile";
 import type { Category } from "~/shared/types/category";
-import { X } from 'lucide-react'; // или любой другой иконки
+import { X } from 'lucide-react'; 
 
 interface CategoryBlockProps {
   activeCategory: Category;

@@ -45,7 +45,6 @@ export const ProfileSettingTab = ({ currentAvatarUrl: externalAvatarUrl, onUpdat
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Синхронизируем с внешним currentAvatarUrl
   useEffect(() => {
     if (user) {
       const data: FormState = {
@@ -66,13 +65,12 @@ export const ProfileSettingTab = ({ currentAvatarUrl: externalAvatarUrl, onUpdat
     setIsSuccess(false);
 
     try {
-      // Сначала отправляем аватарку, если она выбрана
       let avatarUrl: string | undefined;
       if (selectedAvatar) {
         const avatarFormData = new FormData();
         avatarFormData.append('file', selectedAvatar);
 
-        const avatarResponse = await fetch('${process.env.NEXT_PUBLIC_API_URL}/profile/avatar', {
+        const avatarResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile/avatar`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` },
           body: avatarFormData
@@ -81,17 +79,14 @@ export const ProfileSettingTab = ({ currentAvatarUrl: externalAvatarUrl, onUpdat
         if (avatarResponse.ok) {
           const avatarData = await avatarResponse.json();
           avatarUrl = avatarData.avatarUrl;
-          await update({
-            user: {
-              ...user,
-              image: avatarData.avatarUrl
-            }
-          });
+          setPreview(null);
+        } else {
+          console.error("Ошибка загрузки аватарки:", await avatarResponse.text());
         }
       }
 
       if (formData.username !== initialData.username) {
-        await fetch('${process.env.NEXT_PUBLIC_API_URL}/profile/username', {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile/username`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({ username: formData.username })
@@ -99,7 +94,7 @@ export const ProfileSettingTab = ({ currentAvatarUrl: externalAvatarUrl, onUpdat
       }
 
       if (formData.email !== initialData.email) {
-        await fetch('${process.env.NEXT_PUBLIC_API_URL}/profile/email', {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile/email`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({ newEmail: formData.email })
@@ -107,7 +102,7 @@ export const ProfileSettingTab = ({ currentAvatarUrl: externalAvatarUrl, onUpdat
       }
 
       if (formData.bio !== initialData.bio) {
-        await fetch('${process.env.NEXT_PUBLIC_API_URL}/profile/bio', {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile/bio`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({ bio: formData.bio })
@@ -120,7 +115,8 @@ export const ProfileSettingTab = ({ currentAvatarUrl: externalAvatarUrl, onUpdat
           name: formData.username,
           email: formData.email,
           bio: formData.bio,
-          createdAt: formData.createdAt
+          createdAt: formData.createdAt,
+          ...(avatarUrl && { image: avatarUrl })
         }
       });
 
