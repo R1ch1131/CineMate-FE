@@ -141,7 +141,7 @@ export const ReviewPage = () => {
                 ))}
               </ul>
             </div>
-            <HotDebate />
+            {/* <HotDebate /> */}
           </div>
 
           <div className="w-full md:w-8/12">

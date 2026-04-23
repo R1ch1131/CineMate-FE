@@ -1,6 +1,5 @@
 'use client'
 
-import { Bell } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import React from "react";
@@ -14,9 +13,6 @@ export const ProfileButton = () => {
 
   return (
     <div className="flex gap-4">
-      <div className="flex items-center justify-center hover:bg-glass px-4 rounded-2xl cursor-pointer transition-colors">
-        <Bell className="w-5 h-5 text-grey hover:text-white" />
-      </div> 
       <Link 
         href='/profile' 
         className="flex items-center gap-2 hover:bg-glass px-4 py-3 rounded-2xl transition-all border border-transparent hover:border-white/10"

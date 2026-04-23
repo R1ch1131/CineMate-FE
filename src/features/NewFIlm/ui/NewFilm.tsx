@@ -57,7 +57,7 @@ export const NewFilm: FC = () => {
     <div className="bg-glass rounded-2xl p-6">
       <div className="flex justify-between items-center pb-5">
         <div className="flex gap-3">
-          <div className="center flex h-10 w-10 rounded-xl bg-gradient-to-br from-orange-500 to-pink-600">
+          <div className="center flex h-10 w-10 rounded-xl bg-linear-to-br from-orange-500 to-pink-600">
             <Calendar className="h-5 w-5" />
           </div>
           <div className="flex flex-col">
@@ -65,24 +65,29 @@ export const NewFilm: FC = () => {
             <span className="text-grey text-xs">Самые ожидаемые</span>
           </div>
         </div>
-        <div className="px-3 py-1.5 relative flex rounded-full border border-orange-500/30 bg-gradient-to-r from-orange-500/20 to-pink-500/20 text-xs font-semibold text-orange-400">
+        <div className="px-3 py-1.5 relative flex rounded-full border border-orange-500/30 bg-linear-to-r from-orange-500/20 to-pink-500/20 text-xs font-semibold text-orange-400">
           <span>New</span>
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        {movies?.map((movie) => (
-          <NewFilmItem
-            key={movie.id}
-            posterUrl={movie.posterUrl}
-            title={movie.title}
-            author={movie.genres.slice(0, 2).join(', ')}  
-            daysLeft={calculateDaysLeft(movie.releaseDate)}
-            releaseDate={formatReleaseDate(movie.releaseDate)}
-            genre={movie.genres[0] ?? 'Не указан'}
-            views={formatViews(movie.voteAverage)}
-            rating={formatVoteAverage(movie.voteAverage)}
-          />
-        ))}
+        {movies
+  ?.slice() 
+  .sort((a, b) => {
+    return new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime();
+  })
+  .map((movie) => (
+    <NewFilmItem
+      key={movie.id}
+      posterUrl={movie.posterUrl}
+      title={movie.title}
+      author={movie.genres.slice(0, 2).join(', ')}  
+      daysLeft={calculateDaysLeft(movie.releaseDate)}
+      releaseDate={formatReleaseDate(movie.releaseDate)}
+      genre={movie.genres[0] ?? 'Не указан'}
+      views={formatViews(movie.voteAverage)}
+      rating={formatVoteAverage(movie.voteAverage)}
+    />
+  ))}
       </div>
     </div>
   );

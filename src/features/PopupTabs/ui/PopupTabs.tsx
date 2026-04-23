@@ -43,7 +43,7 @@ export const PopupTabs = ({
             <MediaTab  />
           </TabPanel>
           <TabPanel>
-            <ReviewTab /> 
+             <ReviewTab movieId={movie.id} />
           </TabPanel>
         </TabPanels>
       </TabGroup>

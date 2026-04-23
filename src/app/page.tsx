@@ -38,20 +38,21 @@ const fetchNewReleases = async (): Promise<Movie[]> => {
 
 const fetchReviews = async (token?: string): Promise<Review[]> => {
   const headers: HeadersInit = {
-    "Accept": "application/json",
+    Accept: "application/json",
   };
 
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews/all?page=0&size=4`, {
-    headers
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/reviews/all?page=0&size=6`,
+    { headers }
+  );
 
   if (res.status === 403 || res.status === 401) return [];
   if (!res.ok) throw new Error("Ошибка сервера при загрузке рецензий");
-  
+
   const data = (await res.json()) as PaginatedResponse<Review>;
   return data.content || [];
 };
@@ -59,9 +60,9 @@ const fetchReviews = async (token?: string): Promise<Review[]> => {
 export default function HomePage() {
   const { data: session, status } = useSession();
 
-  const { 
-    data: movies, 
-    isLoading: isMoviesLoading 
+  const {
+    data: movies,
+    isLoading: isMoviesLoading,
   } = useQuery<Movie[]>({
     queryKey: ["new-releases"],
     queryFn: fetchNewReleases,
@@ -72,7 +73,7 @@ export default function HomePage() {
     isLoading: isReviewsLoading,
     isFetching: isReviewsFetching,
     error: reviewsError,
-    refetch: refetchReviews
+    refetch: refetchReviews,
   } = useQuery<Review[]>({
     queryKey: ["home-reviews", session?.user?.accessToken, status],
     queryFn: () => fetchReviews(session?.user?.accessToken),
@@ -80,13 +81,13 @@ export default function HomePage() {
     placeholderData: (previousData) => previousData,
   });
 
-  const avatarMap = useAvatarMap((reviews ?? []).map(r => r.userId));
+  const filteredReviews = (reviews ?? []).filter((r) => !r.isSpoiler);
+
+  const avatarMap = useAvatarMap(filteredReviews.map((r) => r.userId));
 
   return (
     <main className="py-10">
       <div className="flex flex-col items-center gap-8">
-
-        {/* Заголовок страницы */}
         <div className="flex flex-col items-center gap-4">
           <div className="flex items-center gap-3">
             <Newspaper className="h-8 w-8 text-amber-500" />
@@ -110,7 +111,8 @@ export default function HomePage() {
 
         <div className="flex w-full max-w-7xl gap-8 px-4 lg:px-0">
           <div className="flex flex-1 flex-col gap-16">
-            
+
+            {/* 🎬 Новинки */}
             <section className="flex flex-col gap-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -140,6 +142,7 @@ export default function HomePage() {
               </div>
             </section>
 
+            {/* 📝 Рецензии */}
             <section className="flex flex-col gap-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -172,9 +175,9 @@ export default function HomePage() {
                   <div className="text-center py-10 bg-glass border border-frostedglass rounded-2xl">
                     <p className="text-red-400">Ошибка загрузки данных</p>
                   </div>
-                ) : reviews && reviews.length > 0 ? (
+                ) : filteredReviews.length > 0 ? (
                   <ReviewCols
-                    reviews={reviews}
+                    reviews={filteredReviews}
                     avatarMap={avatarMap}
                     onActionSuccess={() => {
                       void refetchReviews();
@@ -182,11 +185,9 @@ export default function HomePage() {
                   />
                 ) : (
                   <div className="bg-glass border border-dashed border-frostedglass rounded-3xl py-16 text-center">
-                    {status === "authenticated" ? (
-                      <p className="text-grey italic">Рецензий пока нет. Будьте первым!</p>
-                    ) : (
-                      <p className="text-grey italic">Войдите, чтобы просматривать рецензии сообщества</p>
-                    )}
+                    <p className="text-grey italic">
+                      Пока нет рецензий без спойлеров
+                    </p>
                   </div>
                 )}
               </div>

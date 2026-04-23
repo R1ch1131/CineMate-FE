@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { FilmMyList } from "./FilmMyList";
 
 export interface WatchlistItem {
@@ -15,15 +15,10 @@ export interface WatchlistItem {
 interface FilmGridProps {
   films: WatchlistItem[];
   viewMode: "grid" | "list";
+  onActionSuccess?: () => void;
 }
 
-export const FilmGrid: React.FC<FilmGridProps> = ({ films: initialFilms, viewMode }) => {
-  const [films, setFilms] = useState<WatchlistItem[]>(initialFilms);
-
-  const handleDelete = (tmdbId: number) => {
-    setFilms(prevFilms => prevFilms.filter(film => film.tmdbId !== tmdbId));
-  };
-
+export const FilmGrid: React.FC<FilmGridProps> = ({ films, viewMode, onActionSuccess }) => {
   return (
     <div className={`mx-auto mt-8 max-w-7xl ${
       viewMode === "grid"
@@ -35,7 +30,7 @@ export const FilmGrid: React.FC<FilmGridProps> = ({ films: initialFilms, viewMod
           key={film.tmdbId}
           film={film}
           variant={viewMode}
-          onDelete={() => handleDelete(film.tmdbId)}
+          onActionSuccess={onActionSuccess}
         />
       ))}
     </div>

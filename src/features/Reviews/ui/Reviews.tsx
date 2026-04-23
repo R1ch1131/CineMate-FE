@@ -445,10 +445,6 @@ export const Reviews: React.FC<ReviewsProps> = ({ review, onActionSuccess }) => 
         </div>
 
         <div className="flex gap-3 flex-wrap justify-end">
-          <button className="flex items-center gap-2 rounded-xl bg-amber-600/20 px-3.5 py-2 text-amber-600 transition-all hover:bg-amber-600/30">
-            <Flame width={17} className="fill-amber-600" />
-            <p className="font-medium text-sm">Обсудить</p>
-          </button>
         </div>
       </div>
 
