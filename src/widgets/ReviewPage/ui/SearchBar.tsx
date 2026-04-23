@@ -60,7 +60,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                   <div className="absolute top-1/2 left-3.5 -translate-y-1/2 transform">
                     <Search className="text-white" />
                   </div>
-                  {/* Индикатор типа поиска */}
                   {searchQuery.length >= 2 && (
                     <div className={`absolute top-1/2 right-4 -translate-y-1/2 flex items-center gap-1.5 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full ${
                       isUserSearch 

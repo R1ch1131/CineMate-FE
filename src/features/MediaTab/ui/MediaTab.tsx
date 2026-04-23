@@ -1,5 +1,4 @@
 import React from "react";
-import { LinkButton } from "~/shared/ui/LinkButton";
 
 export const MediaTab = () => {
     return(
@@ -11,14 +10,14 @@ export const MediaTab = () => {
                  <div className="bg-black 2k:h-70 2k:w-100 h-50 w-75 rounded-xl"/>
                   <div className="bg-black 2k:h-70 2k:w-100 h-50 w-75 rounded-xl"/>
             </div>
-            <div className="bg-frostedglass p-4 rounded-2xl flex flex-col gap-3">
+            {/* <div className="bg-frostedglass p-4 rounded-2xl flex flex-col gap-3">
                 <p className="text-lg font-bold">Где посмотреть</p>
                 <div className="grid grid-cols-3 gap-5">
                     <LinkButton name="Netflix" cost="Подписка" color="bg-red-500" />
                     <LinkButton name="iTunes" cost="Аренда $3.99" color="bg-blue-500" />
                     <LinkButton name="Amazon" cost="Покупка $14.99" color="bg-purple-500" />
                 </div>
-            </div>
+            </div> */}
         </div>
     )
 }

@@ -22,11 +22,11 @@ STATUS_OPTIONS.forEach(o => { STATUS_MAP[o.value] = o; });
 
 interface FilmMyListProps {
   film: WatchlistItem;
-  onDelete: () => void;
+  onActionSuccess?: () => void;
   variant: "grid" | "list";
 }
 
-export const FilmMyList: React.FC<FilmMyListProps> = ({ film, onDelete, variant }) => {
+export const FilmMyList: React.FC<FilmMyListProps> = ({ film, onActionSuccess, variant }) => {
   const { data: session } = useSession();
   const queryClient = useQueryClient();
   const [isActive, setIsActive] = useState(false);
@@ -57,6 +57,7 @@ export const FilmMyList: React.FC<FilmMyListProps> = ({ film, onDelete, variant 
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["watchlist"] });
+      onActionSuccess?.();
     },
     onError: (error: Error) => {
       console.error("Watchlist Update Error:", error.message);
@@ -79,7 +80,7 @@ export const FilmMyList: React.FC<FilmMyListProps> = ({ film, onDelete, variant 
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["watchlist"] });
-      onDelete();
+      onActionSuccess?.();
     },
     onError: (error: Error) => {
       console.error("Watchlist Delete Error:", error.message);

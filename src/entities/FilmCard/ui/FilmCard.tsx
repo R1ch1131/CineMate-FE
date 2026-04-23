@@ -65,12 +65,24 @@ export const FilmCard = ({ movie, variant = 'grid' }: FilmCardProps) => {
               <h3 className="text-whitefont-bold text-xl group-hover:text-amber-500">
                 {movie.title}
               </h3>
-              {movie.voteAverage && (
-                <div className="flex bg-glass py-1 px-2 rounded-lg border border-white/10 items-center gap-1 text-amber-400">
-                  <Star className="w-4 h-4 fill-amber-400" />
-                  <span>{movie.voteAverage.toFixed(1)}</span>
-                </div>
-              )}
+              {movie.voteAverage !== undefined && movie.voteAverage !== null && (
+  <div className="flex bg-glass py-1 px-2 rounded-lg border border-white/10 items-center gap-1">
+    <Star
+      className={`w-4 h-4 ${
+        movie.voteAverage === 0
+          ? "text-gray-400 fill-gray-400"
+          : "text-amber-400 fill-amber-400"
+      }`}
+    />
+    <span
+      className={
+        movie.voteAverage === 0 ? "text-gray-400" : "text-amber-400"
+      }
+    >
+      {movie.voteAverage.toFixed(1)}
+    </span>
+  </div>
+)}
             </div>
 
             <div className="mt-2 space-y-2">
@@ -125,14 +137,26 @@ export const FilmCard = ({ movie, variant = 'grid' }: FilmCardProps) => {
 
           <div className="absolute inset-3 z-10">
             <div className="flex justify-between items-start">
-              {movie.voteAverage && (
-                <div className="flex items-center gap-1 bg-black/60 rounded-md px-2 py-1">
-                  <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                  <span className="text-amber-400 font-medium">
-                    {movie.voteAverage.toFixed(1)}
-                  </span>
-                </div>
-              )}
+              {movie.voteAverage !== undefined && movie.voteAverage !== null && (
+  <div className="flex items-center gap-1 bg-black/60 rounded-md px-2 py-1">
+    <Star
+      className={`w-4 h-4 ${
+        movie.voteAverage === 0
+          ? "text-gray-400 fill-gray-400"
+          : "text-amber-400 fill-amber-400"
+      }`}
+    />
+    <span
+      className={
+        movie.voteAverage === 0
+          ? "text-gray-400 font-medium"
+          : "text-amber-400 font-medium"
+      }
+    >
+      {movie.voteAverage.toFixed(1)}
+    </span>
+  </div>
+)}
 
               <div className="flex justify-end ml-auto">
               </div>

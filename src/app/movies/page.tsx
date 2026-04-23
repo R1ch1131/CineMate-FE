@@ -6,7 +6,6 @@ import { useState, useCallback, useEffect } from "react";
 import FilmCardBlock from "~/features/FilmCardBlock/ui/FilmCardBlock";
 import type { Category } from "~/shared/types/category";
 
-// ✅ debounce hook
 function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
@@ -38,7 +37,7 @@ export default function HomePage() {
   function animate(time: number) {
     const elapsed = time - startTime;
     const progress = Math.min(elapsed / duration, 1);
-    const ease = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+    const ease = 1 - Math.pow(1 - progress, 3);
 
     window.scrollTo(0, start * (1 - ease));
 
@@ -48,16 +47,14 @@ export default function HomePage() {
   requestAnimationFrame(animate);
 }
 
-  // 👉 reset page on category/search change
   useEffect(() => {
     setPage(1);
   }, [debouncedSearch, category]);
 
 useEffect(() => {
-  scrollToTop(600); // 600ms плавного скролла
+  scrollToTop(600); 
 }, [page]);
 
-  // 👉 generate pagination with "..."
   const getPagination = () => {
     const pages: (number | string)[] = [];
     const maxVisible = 5;
@@ -117,7 +114,6 @@ useEffect(() => {
         />
       </section>
 
-      {/* 👉 ПАГИНАЦИЯ */}
       <section className="flex justify-center items-center gap-2 py-10 flex-wrap">
        
 

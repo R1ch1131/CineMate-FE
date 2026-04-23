@@ -11,12 +11,23 @@ import { useSession } from "next-auth/react";
 import type { Session } from "next-auth";
 import { ProfileButton } from "~/shared/ui/ProfileButton/ui/ProfileButton";
 
-const activelinkClass =
-  "text-lightorange transition-transform hover:-translate-y-1 gradient-border active";
-const hoverLinkClass =
-  "hover:text-lightorange transition-transform hover:-translate-y-1 transition-colors gradient-border";
-
 const HIDDEN_PATHS = ["/auth"];
+
+const linkWrapper =
+  "relative inline-flex items-center group cursor-pointer";
+
+const textBase =
+  "text-lg 2k:text-xl transition-all duration-200 ease-out";
+
+const activeText = "text-lightorange -translate-y-1";
+const inactiveText =
+  "text-white group-hover:text-lightorange group-hover:-translate-y-1";
+
+const underlineBase =
+  "absolute left-0 -bottom-1 h-[2px] w-0 bg-lightorange transition-all duration-200 ease-out";
+
+const underlineActive = "w-full";
+const underlineInactive = "group-hover:w-full";
 
 export const TopBar = () => {
   const { data: session } = useSession() as { data: Session | null };
@@ -25,6 +36,30 @@ export const TopBar = () => {
   if (HIDDEN_PATHS.includes(activeLink)) {
     return null;
   }
+
+  const renderLink = (href: string, label: string) => {
+    const isActive = activeLink === href;
+
+    return (
+      <Link href={href} className={linkWrapper}>
+        {/* текст — двигается, но hitbox стабильный */}
+        <span
+          className={`${textBase} ${
+            isActive ? activeText : inactiveText
+          }`}
+        >
+          {label}
+        </span>
+
+        {/* underline — отдельный слой */}
+        <span
+          className={`${underlineBase} ${
+            isActive ? underlineActive : underlineInactive
+          }`}
+        />
+      </Link>
+    );
+  };
 
   return (
     <div className="mb-5 flex h-22 w-full items-center justify-between px-32 py-4 text-white">
@@ -35,30 +70,10 @@ export const TopBar = () => {
       </div>
 
       <div className="flex flex-1 justify-center gap-x-10">
-        <Link
-          href="/"
-          className={activeLink === "/" ? activelinkClass : hoverLinkClass}
-        >
-          <p className="2k:text-xl text-lg">{CONSTANTS.topBar.main}</p>
-        </Link>
-        <Link
-          href="/movies"
-          className={activeLink === "/movies" ? activelinkClass : hoverLinkClass}
-        >
-          <p className="2k:text-xl text-lg">{CONSTANTS.topBar.films}</p>
-        </Link>
-        <Link
-          href="/reviews"
-          className={activeLink === "/reviews" ? activelinkClass : hoverLinkClass}
-        >
-          <p className="2k:text-xl text-lg">{CONSTANTS.topBar.reviews}</p>
-        </Link>
-        <Link
-          href="/mylist"
-          className={activeLink === "/mylist" ? activelinkClass : hoverLinkClass}
-        >
-          <p className="2k:text-xl text-lg">{CONSTANTS.topBar.myList}</p>
-        </Link>
+        {renderLink("/", CONSTANTS.topBar.main)}
+        {renderLink("/movies", CONSTANTS.topBar.films)}
+        {renderLink("/reviews", CONSTANTS.topBar.reviews)}
+        {renderLink("/mylist", CONSTANTS.topBar.myList)}
       </div>
 
       <div className="flex flex-1 justify-end">
